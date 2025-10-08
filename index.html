@@ -1,1 +1,140 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ICU Readmission Risk Assessment Tool</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="p-6 bg-gray-100 font-sans">
+
+  <div class="max-w-7xl mx-auto space-y-8">
+    <h1 class="text-2xl font-bold text-center text-gray-800">ICU Readmission Risk Assessment Tool</h1>
+
+    <form id="assessmentForm" class="space-y-6">
+
+      <!-- Red Flags Section -->
+      <div class="bg-red-50 border border-red-200 rounded-xl p-6 space-y-4">
+        <h2 class="text-red-800 font-bold text-lg">🔴 Red Flags – High Risk</h2>
+        <p class="text-sm text-red-700">Triggers 72-hour follow-up and daily review</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <input type="number" id="npFlow" placeholder="NP Flow (L/min)" class="p-2 border rounded-md" />
+          <input type="number" id="hfnpFiO2" placeholder="HFNP FiO₂ (%)" class="p-2 border rounded-md" />
+          <input type="number" id="hfnpFlow" placeholder="HFNP Flow (L/min)" class="p-2 border rounded-md" />
+          <input type="checkbox" id="rapidWean" /> <label for="rapidWean">Rapid weaning from HFNP → NP</label>
+          <input type="number" id="addsScore" placeholder="ADDS Score" class="p-2 border rounded-md" />
+          <input type="checkbox" id="vasopressorsUsed" /> <label for="vasopressorsUsed">Vasopressors used in last 24h</label>
+          <input type="checkbox" id="deliriumPresent" /> <label for="deliriumPresent">Delirium or GCS < 15</label>
+          <input type="number" id="lactateLevel" placeholder="Lactate (mmol/L)" class="p-2 border rounded-md" />
+          <input type="number" id="creatinineChange" placeholder="Creatinine rise (μmol/L)" class="p-2 border rounded-md" />
+          <input type="number" id="creatinineRatio" placeholder="Creatinine ratio to baseline" class="p-2 border rounded-md" />
+          <input type="number" id="uopRate" placeholder="UOP (mL/kg/h)" class="p-2 border rounded-md" />
+          <input type="checkbox" id="uopDuration" /> <label for="uopDuration">Low UOP ≥6h</label>
+          <input type="number" id="crpLevel" placeholder="CRP (mg/L)" class="p-2 border rounded-md" />
+          <input type="number" id="wccLevel" placeholder="WCC" class="p-2 border rounded-md" />
+          <input type="checkbox" id="feverPresent" /> <label for="feverPresent">Fever ≥38°C</label>
+          <input type="checkbox" id="antibioticsOngoing" /> <label for="antibioticsOngoing">Ongoing antibiotics</label>
+          <input type="checkbox" id="nurseOverrideRed" /> <label for="nurseOverrideRed">Nurse override</label>
+        </div>
+      </div>
+
+      <!-- Amber Flags Section -->
+      <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-6 space-y-4">
+        <h2 class="text-yellow-800 font-bold text-lg">🟠 Amber Flags – Moderate Risk</h2>
+        <p class="text-sm text-yellow-700">Triggers 48-hour follow-up</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <input type="number" id="npFlowAmber" placeholder="NP Flow (L/min)" class="p-2 border rounded-md" />
+          <input type="number" id="hfnpFiO2Amber" placeholder="HFNP FiO₂ (%)" class="p-2 border rounded-md" />
+          <input type="number" id="addsScoreAmber" placeholder="ADDS Score" class="p-2 border rounded-md" />
+          <input type="number" id="lactateAmber" placeholder="Lactate (mmol/L)" class="p-2 border rounded-md" />
+          <input type="number" id="creatinineAmber" placeholder="Creatinine (μmol/L)" class="p-2 border rounded-md" />
+          <input type="checkbox" id="nurseOverrideAmber" /> <label for="nurseOverrideAmber">Nurse override</label>
+        </div>
+      </div>
+
+      <!-- Green Flags Section -->
+      <div class="bg-green-50 border border-green-200 rounded-xl p-6 space-y-4">
+        <h2 class="text-green-800 font-bold text-lg">🟢 Green – Low Risk</h2>
+        <p class="text-sm text-green-700">Triggers 24-hour follow-up only</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <input type="number" id="addsScoreGreen" placeholder="ADDS Score" class="p-2 border rounded-md" />
+          <input type="checkbox" id="stableVitals" /> <label for="stableVitals">Stable vitals and bloods</label>
+        </div>
+      </div>
+
+      <!-- Structured Review Section -->
+      <div class="bg-white border border-gray-300 rounded-xl p-6 space-y-4">
+        <h2 class="text-gray-800 font-bold text-lg">📋 Structured Review</h2>
+        <p class="text-sm text-gray-600">Reviewed at each follow-up</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <input type="checkbox" id="electrolytes" /> <label for="electrolytes">Electrolytes (K, Mg, Phos, Na)</label>
+          <input type="checkbox" id="nutrition" /> <label for="nutrition">Nutrition</label>
+          <input type="checkbox" id="linesDrains" /> <label for="linesDrains">Lines & drains</label>
+          <input type="checkbox" id="bowelFunction" /> <label for="bowelFunction">Bowel function</label>
+          <input type="checkbox" id="positioning" /> <label for="positioning">Positioning & MSK</label>
+          <input type="checkbox" id="psychosocial" /> <label for="psychosocial">Psychosocial/discharge readiness</label>
+          <input type="checkbox" id="labsReview" /> <label for="labsReview">WCC, CRP, Albumin, Hb</label>
+          <input type="checkbox" id="tracheostomy" /> <label for="tracheostomy">Tracheostomy status</label>
+        </div>
+      </div>
+
+      <!-- Summary Section -->
+      <div class="bg-gray-50 border border-gray-300 rounded-xl p-6 space-y-4">
+        <h2 class="text-gray-800 font-bold text-lg">🔢 Flag Summary</h2>
+        <p id="summaryText" class="text-sm text-gray-700">Summary will appear here...</p>
+        <button type="button" onclick="evaluateFlags()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">Evaluate Risk</button>
+      </div>
+
+    </form>
+  </div>
+
+  <script>
+    function evaluateFlags() {
+      let red = 0, amber = 0, green = 0;
+
+      // Red Flags
+      if (parseFloat(document.getElementById("npFlow").value) >= 3) red++;
+      if (parseFloat(document.getElementById("hfnpFiO2").value) >= 40) red++;
+      if (parseFloat(document.getElementById("hfnpFlow").value) >= 40) red++;
+      if (document.getElementById("rapidWean").checked) red++;
+      if (parseFloat(document.getElementById("addsScore").value) >= 4) red++;
+      if (document.getElementById("vasopressorsUsed").checked) red++;
+      if (document.getElementById("deliriumPresent").checked) red++;
+      if (parseFloat(document.getElementById("lactateLevel").value) > 2.5) red++;
+      if (parseFloat(document.getElementById("creatinineChange").value) >= 26 || parseFloat(document.getElementById("creatinineRatio").value) >= 1.5) red++;
+      if (parseFloat(document.getElementById("uopRate").value) < 0.5 && document.getElementById("uopDuration").checked) red++;
+      if (parseFloat(document.getElementById("crpLevel").value) > 100) red++;
+      if (parseFloat(document.getElementById("wccLevel").value) > 12 || parseFloat(document.getElementById("wccLevel").value) < 4) red++;
+      if (document.getElementById("feverPresent").checked) red++;
+      if (document.getElementById("antibioticsOngoing").checked) red++;
+      if (document.getElementById("nurseOverrideRed").checked) red++;
+
+      // Amber Flags
+      if (parseFloat(document.getElementById("npFlowAmber").value) === 2) amber++;
+      if (parseFloat(document.getElementById("hfnpFiO2Amber").value) < 40) amber++;
+      if (parseFloat(document.getElementById("addsScoreAmber").value) === 3) amber++;
+      if (parseFloat(document.getElementById("lactateAmber").value) >= 2.0 && parseFloat(document.getElementById("lactateAmber").value) <= 2.5) amber++;
+      if (parseFloat(document.getElementById("creatinineAmber").value) > 120) amber++;
+      if (document.getElementById("nurseOverrideAmber").checked) amber++;
+
+      // Green Flags
+      if (parseFloat(document.getElementById("addsScoreGreen").value) <= 2 && document.getElementById("stableVitals").checked) green++;
+
+      // Summary
+      let summary = `Red Flags: ${red} | Amber Flags: ${amber} | Green Flags: ${green}\n`;
+      if (red > 0) summary += "→ High Risk: 72h follow-up + daily review\n";
+      else if (amber > 0) summary += "→ Moderate Risk: 48h follow-up\n";
+      else summary += "→ Low Risk: 24h follow-up only\n";
+
+      document.getElementById("summaryText").innerText = summary;
+    }
+  </script>
+
+</body>
+</html>
+
