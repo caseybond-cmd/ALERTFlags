@@ -20,7 +20,7 @@
       .card{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px; margin-bottom:16px; box-shadow: 0 1px 3px rgba(0,0,0,0.02), 0 1px 2px rgba(0,0,0,0.04);}
       .col-2{grid-column:span 2}.col-3{grid-column:span 3}.col-4{grid-column:span 4}.col-6{grid-column:span 6}.col-12{grid-column:span 12}
       label{display:block; font-size:.9rem; color:var(--muted); margin-bottom:6px; font-weight:500;}
-      input[type="text"], input[type="number"], select, textarea{
+      input[type="text"], input[type="number"], input[type="date"], select, textarea{
         width:100%; padding:12px; border-radius:10px; border:1px solid var(--line); box-sizing:border-box;
         background:var(--input-bg); color:var(--ink); outline:none; font-size:1rem; transition: border-color 0.2s;
       }
@@ -112,6 +112,25 @@
             <div class="col-4"><label for="icuLos">ICU LOS (days)</label><input id="icuLos" type="number" min="0"/></div>
             <div class="col-4"><label for="ptLoc">Location/Bed</label><input id="ptLoc" type="text"/></div>
             <div class="col-12"><label for="ptAdmissionReason">Primary Reason for ICU Admission</label><input id="ptAdmissionReason" type="text"/></div>
+            <div class="col-4">
+                <label for="reviewType">Review Type</label>
+                <div style="display:flex; gap:10px; padding-top:8px;">
+                    <label style="display:flex; align-items:center; gap:5px; font-size:0.9rem; color:var(--ink); font-weight:400;"><input type="radio" name="reviewType" id="reviewPre" value="pre" checked> Pre-Stepdown</label>
+                    <label style="display:flex; align-items:center; gap:5px; font-size:0.9rem; color:var(--ink); font-weight:400;"><input type="radio" name="reviewType" id="reviewPost" value="post"> Post-Stepdown</label>
+                </div>
+            </div>
+            <div class="col-4">
+                <label for="stepdownDate">Stepdown Date</label>
+                <input type="date" id="stepdownDate">
+            </div>
+            <div class="col-4">
+                <label for="stepdownTime">Stepdown Time</label>
+                <select id="stepdownTime">
+                    <option value="Morning">Morning</option>
+                    <option value="Afternoon">Afternoon</option>
+                    <option value="Night">Night</option>
+                </select>
+            </div>
         </div>
     </div>
     <div class="card">
@@ -262,6 +281,7 @@ const makeTag = (txt, cls) => `<span class="tag ${cls}">${txt}</span>`;
 // --- APP STATE ---
 const inputs = [
     'ptName','ptMrn','ptAge','ptLoc','ptAdmissionReason','icuLos',
+    'stepdownDate', 'stepdownTime',
     'oxMod','npFlow','np3Last12h','hfnpFio2','hfnpFlow','nivDetails','rapidWean','pressors24h','after_hours_discharge',
     'adds','lactate','confused','akiConcern','uopLow','infectionConcern',
     'override','overrideNote',
@@ -300,8 +320,12 @@ function initialize() {
 
     inputs.forEach(id => {
         const el = $(id); if (!el) return;
-        const eventType = (el.type === 'checkbox' || el.tagName === 'SELECT') ? 'change' : 'input';
+        const eventType = (el.type === 'checkbox' || el.tagName === 'SELECT' || el.type === 'date') ? 'change' : 'input';
         el.addEventListener(eventType, debouncedCompute);
+    });
+
+    document.querySelectorAll('input[name="reviewType"]').forEach(radio => {
+        radio.addEventListener('change', debouncedCompute);
     });
     
     // Override Buttons
@@ -350,8 +374,37 @@ function getState() {
         const el = $(id);
         if (el) { state[id] = el.type === 'checkbox' ? el.checked : el.value; }
     }
+    const checkedRadio = document.querySelector('input[name="reviewType"]:checked');
+    state['reviewType'] = checkedRadio ? checkedRadio.value : 'pre';
     return state;
 }
+
+function calculateTimeOnWard(dateStr, timeOfDay) {
+    if (!dateStr) return null;
+
+    const timeMap = { 'Morning': 9, 'Afternoon': 15, 'Night': 21 };
+    const stepdownHour = timeMap[timeOfDay] || 12;
+
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const stepdownDate = new Date(year, month - 1, day, stepdownHour, 0, 0);
+
+    if (isNaN(stepdownDate.getTime())) return null;
+
+    const now = new Date();
+    const diffMs = now.getTime() - stepdownDate.getTime();
+
+    if (diffMs < 0) return " (future date)";
+
+    const diffHours = diffMs / (1000 * 60 * 60);
+
+    if (diffHours < 24) {
+        return `~${Math.round(diffHours)} hours on ward`;
+    } else {
+        const diffDays = Math.floor(diffHours / 24);
+        return `Day ${diffDays + 1} on ward`;
+    }
+}
+
 
 function updateBloodFlags(s) {
     for (const [key, range] of Object.entries(normalRanges)) {
@@ -427,8 +480,21 @@ function updateDisplay(s, red, amber) {
     }
     
     // --- SUMMARY TEXT GENERATION ---
-    const lines = [ 'ALERT CNS Review',
-        `Patient: ${s.ptName||'--'} | MRN: ${s.ptMrn||'--'} | Location: ${s.ptLoc||'--'}`,
+    const headerLines = [ 'ALERT CNS Review',
+        `Patient: ${s.ptName||'--'} | MRN: ${s.ptMrn||'--'} | Location: ${s.ptLoc||'--'}` ];
+    
+    if (s.reviewType === 'post') {
+        const timeOnWard = calculateTimeOnWard(s.stepdownDate, s.stepdownTime);
+        if (timeOnWard) {
+            headerLines.push(`Post-ICU step down review. ${timeOnWard} (Prior ICU LOS: ${s.icuLos || '--'} days).`);
+        } else {
+            headerLines.push(`Post-ICU step down review. (Prior ICU LOS: ${s.icuLos || '--'} days).`);
+        }
+    } else {
+        headerLines.push(`Pre-stepdown review. ICU LOS: ${s.icuLos || '--'} days.`);
+    }
+
+    const lines = [ ...headerLines,
         `ICU Admission: ${s.ptAdmissionReason || 'Not specified'}`, `---`,
         `Assessment Category: ${cat.catNum}.`];
     
