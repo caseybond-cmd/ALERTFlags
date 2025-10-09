@@ -12,13 +12,13 @@
         --bg:#0a0e14; --card:#121a23; --ink:#e9f0f7; --muted:#8d98a6; --accent:#0084ff;
         --red:#ff4d4f; --amber:#ffb020; --green:#22c55e; --line:#253242; --input-bg:#0a0e14;
       }
-      body{font-family:'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:var(--bg); color:var(--ink); margin:0 0 80px 0; line-height:1.4;}
+      body{font-family:'Inter', system-ui, sans-serif; background:var(--bg); color:var(--ink); margin:0 0 80px 0; line-height:1.4;}
       header{padding:16px 20px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:12px; flex-wrap:wrap; background: var(--bg);}
       header h1{font-size:1.2rem; margin:0; flex:1}
       .container{max-width:800px; margin:0 auto; padding:16px}
       .grid{display:grid; grid-template-columns:repeat(12,1fr); gap:16px}
       .card{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px; margin-bottom:16px;}
-      .col-4{grid-column:span 4}.col-6{grid-column:span 6}.col-8{grid-column:span 8}.col-12{grid-column:span 12}
+      .col-4{grid-column:span 4}.col-6{grid-column:span 6}.col-12{grid-column:span 12}
       label{display:block; font-size:.9rem; color:var(--muted); margin-bottom:6px; font-weight:500;}
       input[type="text"], input[type="number"], select, textarea{
         width:100%; padding:12px; border-radius:10px; border:1px solid var(--line); box-sizing:border-box;
@@ -38,9 +38,8 @@
       .kpi .box small{color:var(--muted); font-size: 0.8rem;}
       .status{font-weight:700}
       .status.red{color:var(--red)} .status.amber{color:var(--amber)} .status.green{color:var(--green)}
-      .section-title{margin:24px 0 12px; font-size:1.1rem; font-weight:600; color:#cdd8e4; border-bottom:1px solid var(--line); padding-bottom:8px;}
-      .card > .section-title:first-child { margin-top: 0; }
-      .check-group { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+      .section-title{margin-bottom:12px; font-size:1.1rem; font-weight:600; color:#cdd8e4;}
+      .check-group { display: flex; flex-direction: column; gap: 10px; }
       .check-label {
         display: flex; align-items: center; background-color: var(--input-bg); padding: 12px; border-radius: 10px;
         border: 1px solid var(--line); cursor: pointer; transition: all 0.2s;
@@ -54,6 +53,7 @@
       .check-label .checkmark:after { content: '✓'; font-size: 14px; color: white; opacity: 0; transform: scale(0.5); transition: all 0.2s;}
       .check-label input:checked ~ .checkmark { background-color: var(--accent); border-color: var(--accent); }
       .check-label input:checked ~ .checkmark:after { opacity: 1; transform: scale(1); }
+      .input-group { margin-bottom: 24px; }
       footer {
         position: fixed; bottom: 0; left: 0; width: 100%; background: #1a2633;
         border-top: 1px solid var(--line); padding: 12px 20px;
@@ -63,7 +63,7 @@
       .footer-item strong { color: var(--ink); font-weight: 500; }
       .footer-score { padding: 8px 16px; border-radius: 8px; font-weight: 700; text-align: center;}
       @media (max-width:700px){
-          .col-4,.col-6,.col-8{grid-column:span 12}
+          .col-4,.col-6{grid-column:span 12}
           footer { flex-wrap: wrap; justify-content: center; text-align: center; padding: 8px; }
           .footer-item { width: 45%; }
           .footer-score { width: 100%; margin-top: 8px; }
@@ -95,61 +95,42 @@
         </div>
     </div>
     <div class="card">
-        <h2 class="section-title">Risk Factors Assessment</h2>
-        <div class="grid">
-            <div class="col-6">
-                <label>Cognition & Vitals</label>
-                <div class="grid" style="gap: 8px !important; margin-top: 8px;">
-                    <div class="col-6"><label for="adds">ADDS</label><input id="adds" type="number" min="0" max="10" /></div>
-                    <div class="col-6"><label for="gcs">GCS</label><input id="gcs" type="number" min="3" max="15" /></div>
-                </div>
-                <div class="check-group">
-                    <label class="check-label"><input id="confused" type="checkbox" /><span class="checkmark"></span>Confused / Muddled</label>
-                </div>
-            </div>
-            <div class="col-6">
-                 <label>Circulation & Labs</label>
-                <div class="grid" style="gap: 8px !important; margin-top: 8px;">
-                     <div class="col-12"><label for="lactate">Lactate (mmol/L)</label><input id="lactate" type="number" step="0.1" min="0" /></div>
-                </div>
-                 <div class="check-group">
-                    <label class="check-label"><input id="pressors24h" type="checkbox" /><span class="checkmark"></span>Vasopressors in last 24h</label>
-                </div>
-            </div>
-             <div class="col-12">
-                <h2 class="section-title">Respiratory</h2>
-                <div class="grid">
-                    <div class="col-4"><label for="oxMod">Oxygen Modality</label><select id="oxMod"><option value="RA">Room Air</option><option value="NP">Nasal Prongs</option><option value="HFNP">HFNP</option><option value="Other">Other</option></select></div>
-                    <div class="col-4 npOnly" style="display:none"><label for="npFlow">NP Flow (L/min)</label><input id="npFlow" type="number" step="0.5" min="0" /></div>
-                    <div class="col-4 hfnpOnly" style="display:none"><label for="hfnpFio2">HFNP FiO₂ (%)</label><input id="hfnpFio2" type="number" step="1" min="21" max="100" /></div>
-                    <div class="col-4 hfnpOnly" style="display:none"><label for="hfnpFlow">HFNP Flow (L/min)</label><input id="hfnpFlow" type="number" step="1" min="0" /></div>
-                </div>
-                 <div class="check-group">
-                    <label class="check-label"><input id="np3Last12h" type="checkbox" /><span class="checkmark"></span>NP ≥3 L/min at any time in last 12h</label>
-                    <label class="check-label"><input id="rapidWean" type="checkbox" /><span class="checkmark"></span>Rapid wean HFNP → NP in last 12h</label>
-                </div>
-            </div>
-             <div class="col-12">
-                 <h2 class="section-title">Renal & Infection</h2>
-                <div class="grid">
-                    <div class="col-6"><label for="crNow">Current Creatinine (μmol/L)</label><input id="crNow" type="number" step="1" min="0"/></div>
-                    <div class="col-6"><label for="crBase">Baseline Creatinine (μmol/L)</label><input id="crBase" type="number" step="1" min="0"/></div>
-                </div>
-                 <div class="check-group">
-                    <label class="check-label"><input id="crRise" type="checkbox" /><span class="checkmark"></span>Creatinine rise ≥26 μmol/L in last 48h</label>
-                    <label class="check-label"><input id="uopLow" type="checkbox" /><span class="checkmark"></span>UOP concerning / trending &lt;0.5 mL/kg/hr</label>
-                    <label class="check-label"><input id="infectionConcern" type="checkbox" /><span class="checkmark"></span>Clinical infection concern</label>
-                </div>
+        <div class="input-group">
+            <div class="grid">
+                <div class="col-4"><label for="adds">ADDS</label><input id="adds" type="number" min="0" max="10" /></div>
+                <div class="col-4"><label for="gcs">GCS</label><input id="gcs" type="number" min="3" max="15" /></div>
+                <div class="col-4"><label for="lactate">Lactate</label><input id="lactate" type="number" step="0.1" min="0"/></div>
             </div>
         </div>
-        <h2 class="section-title">Clinical Judgement Override</h2>
-        <div class="grid">
-            <div class="col-4"><label>Escalate risk?</label><select id="override"><option value="none">No</option><option value="amber">Yes - Amber</option><option value="red">Yes - Red</option></select></div>
-            <div class="col-8"><label>Reason for override</label><input id="overrideNote" type="text"/></div>
+        <div class="input-group">
+             <div class="grid">
+                <div class="col-4"><label for="oxMod">Oxygen Modality</label><select id="oxMod"><option value="RA">Room Air</option><option value="NP">Nasal Prongs</option><option value="HFNP">HFNP</option><option value="Other">Other</option></select></div>
+                <div class="col-4 npOnly" style="display:none"><label for="npFlow">NP Flow (L/min)</label><input id="npFlow" type="number" step="0.5" min="0" /></div>
+                <div class="col-4 hfnpOnly" style="display:none"><label for="hfnpFio2">HFNP FiO₂ (%)</label><input id="hfnpFio2" type="number" step="1" min="21" max="100" /></div>
+                <div class="col-4 hfnpOnly" style="display:none"><label for="hfnpFlow">HFNP Flow (L/min)</label><input id="hfnpFlow" type="number" step="1" min="0" /></div>
+            </div>
+        </div>
+        <div class="input-group">
+            <div class="check-group">
+                <label class="check-label"><input id="confused" type="checkbox" /><span class="checkmark"></span>Confused / Muddled</label>
+                <label class="check-label"><input id="pressors24h" type="checkbox" /><span class="checkmark"></span>Vasopressors in last 24h</label>
+                <label class="check-label"><input id="np3Last12h" type="checkbox" /><span class="checkmark"></span>NP ≥3 L/min at any time in last 12h</label>
+                <label class="check-label"><input id="rapidWean" type="checkbox" /><span class="checkmark"></span>Rapid wean HFNP → NP in last 12h</label>
+                <label class="check-label"><input id="akiConcern" type="checkbox" /><span class="checkmark"></span>AKI / Concerning Creatinine Rise</label>
+                <label class="check-label"><input id="uopLow" type="checkbox" /><span class="checkmark"></span>UOP concerning / trending &lt;0.5 mL/kg/hr</label>
+                <label class="check-label"><input id="infectionConcern" type="checkbox" /><span class="checkmark"></span>Clinical infection concern</label>
+            </div>
+        </div>
+        <div class="input-group">
+            <div class="section-title">Clinical Judgement Override</div>
+            <div class="grid">
+                <div class="col-6"><label>Escalate risk?</label><select id="override"><option value="none">No</option><option value="amber">Yes - Amber (CAT 2)</option><option value="red">Yes - Red (CAT 1)</option></select></div>
+                <div class="col-6"><label>Reason for override</label><input id="overrideNote" type="text"/></div>
+            </div>
         </div>
     </div>
     <div class="card">
-        <h2 class="section-title">Structured Review (Optional)</h2>
+        <div class="section-title">Structured Review (Optional)</div>
         <div class="grid">
             <div class="col-6"><label>Electrolytes / Labs</label><input id="elec" type="text" /></div>
             <div class="col-6"><label>Nutrition</label><input id="nutrition" type="text" /></div>
@@ -160,7 +141,7 @@
         </div>
     </div>
     <div class="card">
-        <h2 class="section-title">Auto‑Generated Summary</h2>
+        <div class="section-title">Auto‑Generated Summary</div>
         <div id="flagList" style="margin-bottom:12px;"></div>
         <textarea id="summary" placeholder="Summary will auto-generate here..." readonly></textarea>
         <div style="margin-top:12px;"><button class="btn primary" id="copyBtn">Copy Summary</button></div>
@@ -178,11 +159,11 @@ const $ = (id) => document.getElementById(id);
 const debounce = (func, delay) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), delay); }; };
 const num = (v) => { const x = parseFloat(v); return isNaN(x) ? null : x; };
 
-// --- APP STATE & DOM ELEMENTS ---
+// --- APP STATE ---
 const inputs = [
     'ptName','ptMrn','ptAge','ptWt','ptLoc','ptAdmissionReason',
     'oxMod','npFlow','np3Last12h','hfnpFio2','hfnpFlow','rapidWean','pressors24h',
-    'adds','gcs','confused','lactate','crBase','crNow','crRise','uopLow','infectionConcern',
+    'adds','gcs','confused','lactate','akiConcern','uopLow','infectionConcern',
     'override','overrideNote','elec','nutrition','lines','bowel','msk','psych'
 ];
 const sr_inputs = { 'Electrolytes': 'elec', 'Nutrition': 'nutrition', 'Lines/Drains': 'lines', 'Bowel': 'bowel', 'Mobility': 'msk', 'Psychosocial': 'psych' };
@@ -193,4 +174,99 @@ function initialize() {
     $('now').textContent = new Date().toLocaleString('en-AU');
     $('oxMod').addEventListener('change', () => { toggleOxyFields(); computeAll(); });
     toggleOxyFields();
-    const debouncedCompute = debounce(compute
+    const debouncedCompute = debounce(computeAll, 250);
+    inputs.forEach(id => {
+        const el = $(id); if (!el) return;
+        const eventType = (el.type === 'checkbox' || el.tagName === 'SELECT') ? 'change' : 'input';
+        el.addEventListener(eventType, debouncedCompute);
+    });
+    $('copyBtn').addEventListener('click', async () => {
+        try { await navigator.clipboard.writeText($('summary').value); alert('Summary copied.'); } catch (e) { alert('Copy failed.'); }
+    });
+    computeAll();
+}
+
+function toggleOxyFields() {
+    const mod = $('oxMod').value;
+    document.querySelectorAll('.npOnly').forEach(el => el.style.display = (mod === 'NP') ? '' : 'none');
+    document.querySelectorAll('.hfnpOnly').forEach(el => el.style.display = (mod === 'HFNP') ? '' : 'none');
+}
+
+// --- CORE CALCULATION LOGIC ---
+function computeAll() {
+    const s = {}; inputs.forEach(id => { const e=$(id); if(e) s[id] = e.type==='checkbox' ? e.checked : e.value; });
+    const red = [], amber = [];
+
+    // --- FLAG COMPUTATIONS ---
+    if (s.oxMod === 'NP') {
+        const flow = num(s.npFlow);
+        if (s.np3Last12h || (flow !== null && flow >= 3)) red.push('FiO₂: NP ≥3 L/min');
+        else if (flow >= 2 && flow < 3) amber.push('FiO₂: NP 2-2.5 L/min');
+    } else if (s.oxMod === 'HFNP') {
+        const fio2=num(s.hfnpFio2), flow=num(s.hfnpFlow);
+        if ((fio2 && fio2 >= 40) || (flow && flow >= 40)) red.push('FiO₂: HFNP ≥40% or ≥40 L/min');
+        else if (fio2 > 21 || flow > 0) amber.push('On HFNP (low settings)');
+    }
+    if (s.rapidWean) red.push('Rapid wean HFNP→NP');
+    if (s.pressors24h) red.push('Vasopressors in last 24h');
+    const adds = num(s.adds); if (adds >= 3) red.push(`ADDS ≥3 (is ${adds})`);
+    if (s.confused) red.push('Altered Cognition: Confused');
+    const gcs = num(s.gcs); if (gcs < 15) red.push(`Altered Cognition: GCS < 15 (is ${gcs})`);
+    const l = num(s.lactate);
+    if (l > 2.5) red.push(`Lactate > 2.5 (is ${l})`); else if (l >= 2.0) amber.push(`Lactate 2.0-2.5 (is ${l})`);
+    if (s.akiConcern) red.push('AKI / Creatinine Concern');
+    if (s.uopLow) red.push('Oliguria Concern');
+    if (s.infectionConcern) red.push('Clinical infection concern');
+    const note = s.overrideNote ? ` (${s.overrideNote})` : '';
+    if (s.override === 'red') red.push(`Override: Red concern${note}`);
+    if (s.override === 'amber') amber.push(`Override: Amber concern${note}`);
+
+    updateDisplay(s, red, amber);
+}
+
+function updateDisplay(s, red, amber) {
+    const redCount = red.length, amberCount = amber.length;
+    $('redCount').textContent = redCount; $('amberCount').textContent = amberCount;
+    const cat = (redCount > 0) ? {id: 'red', text: '🛑 HIGH (CAT 1)', follow: '72h'} :
+                (amberCount > 0) ? {id: 'amber', text: '🟠 MODERATE (CAT 2)', follow: '48h'} :
+                {id: 'green', text: '🟢 LOW', follow: '24h'};
+
+    $('catText').className = 'status ' + cat.id; $('catText').textContent = cat.text;
+    $('followUp').textContent = cat.follow;
+    
+    const makeTag = (txt, cls) => `<span class="tag ${cls}">${txt}</span>`;
+    if (redCount > 0 || amberCount > 0) {
+        $('flagList').innerHTML = [...red.map(f => makeTag(f, 'red')), ...amber.map(f => makeTag(f, 'amber'))].join('');
+    } else {
+        $('flagList').innerHTML = makeTag('No risk factors identified', 'green');
+    }
+    
+    // Summary Text
+    const lines = [ `Patient: ${s.ptName||'--'} | MRN: ${s.ptMrn||'--'} | Location: ${s.ptLoc||'--'}`,
+        `ICU Admission: ${s.ptAdmissionReason || 'Not specified'}`, `---`,
+        `ASSESSMENT: ${cat.text.substring(2)}. Flags CAT 1/2: ${redCount}/${amberCount}. Suggested Follow-Up: ${cat.follow}.`];
+    if (red.length) lines.push('CAT 1 FLAGS: ' + red.join('; '));
+    if (amber.length) lines.push('CAT 2 FLAGS: ' + amber.join('; '));
+    
+    const sr_summary = [];
+    for(const [label, id] of Object.entries(sr_inputs)){
+        if(s[id]) sr_summary.push(`${label}: ${s[id]}`);
+    }
+    if(sr_summary.length > 0){
+        lines.push('---', 'STRUCTURED REVIEW:', ...sr_summary);
+    }
+    $('summary').value = lines.join('\n');
+    
+    // Sticky Footer
+    $('footerName').textContent = s.ptName || '--';
+    $('footerLoc').textContent = s.ptLoc || '--';
+    $('footerReason').textContent = s.ptAdmissionReason || '--';
+    const scoreEl = $('footerScore');
+    scoreEl.className = `footer-score tag ${cat.id}`;
+    scoreEl.textContent = cat.text.substring(2);
+}
+
+document.addEventListener('DOMContentLoaded', initialize);
+</script>
+</body>
+</html>
