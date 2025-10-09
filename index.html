@@ -4,44 +4,72 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>ICU Readmission Risk Tool</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
       :root{
-        --bg:#0b0f14; --card:#121821; --ink:#e9f0f7; --muted:#a9b7c6; --accent:#4ea1ff;
-        --red:#ff4d4f; --amber:#ffb020; --green:#22c55e; --line:#253242;
+        --bg:#0a0e14; --card:#121a23; --ink:#e9f0f7; --muted:#8d98a6; --accent:#0084ff;
+        --red:#ff4d4f; --amber:#ffb020; --green:#22c55e; --line:#253242; --input-bg:#0a0e14;
       }
-      body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);margin:0;line-height:1.35;}
-      header{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-      header h1{font-size:1.2rem;margin:0;flex:1}
-      .container{max-width:800px;margin:0 auto;padding:16px}
-      .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}
-      .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px; margin-bottom: 12px;}
-      .col-3{grid-column:span 3}.col-4{grid-column:span 4}.col-6{grid-column:span 6}.col-12{grid-column:span 12}
-      label{display:block;font-size:.9rem;color:var(--muted);margin-bottom:4px}
+      body{font-family:'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:var(--bg); color:var(--ink); margin:0 0 80px 0; line-height:1.4;}
+      header{padding:16px 20px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:12px; flex-wrap:wrap; background: var(--bg);}
+      header h1{font-size:1.2rem; margin:0; flex:1}
+      .container{max-width:800px; margin:0 auto; padding:16px}
+      .grid{display:grid; grid-template-columns:repeat(12,1fr); gap:16px}
+      .card{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px; margin-bottom:16px;}
+      .col-4{grid-column:span 4}.col-6{grid-column:span 6}.col-8{grid-column:span 8}.col-12{grid-column:span 12}
+      label{display:block; font-size:.9rem; color:var(--muted); margin-bottom:6px; font-weight:500;}
       input[type="text"], input[type="number"], select, textarea{
-        width:100%;padding:10px;border-radius:10px;border:1px solid var(--line); box-sizing: border-box;
-        background:#0e141b;color:var(--ink);outline:none;
+        width:100%; padding:12px; border-radius:10px; border:1px solid var(--line); box-sizing:border-box;
+        background:var(--input-bg); color:var(--ink); outline:none; font-size:1rem;
       }
-      textarea{min-height:70px;resize:vertical}
-      .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-      .pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:.85rem;border:1px solid var(--line);background:#0e141b;}
-      .tag{display:inline-flex;align-items:center;padding:4px 8px;border-radius:999px;font-size:.8rem;margin:2px;border:1px solid var(--line)}
-      .tag.red{background:rgba(255,77,79,.1);color:var(--red);border-color:rgba(255,77,79,.3)}
-      .tag.amber{background:rgba(255,176,32,.15);color:var(--amber);border-color:rgba(255,176,32,.35)}
-      .tag.green{background:rgba(34,197,94,.12);color:var(--green);border-color:rgba(34,197,94,.3)}
-      .btn{background:#152233;color:var(--ink);border:1px solid var(--line);padding:10px 14px;border-radius:10px;cursor:pointer;}
-      .btn.primary{background:var(--accent);color:#001a33;border:none}
-      .btn:disabled{opacity:.6;cursor:not-allowed}
-      .kpi{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-      .kpi .box{background:#0e141b;border:1px solid var(--line);padding:12px;border-radius:12px;flex:1;text-align:center}
-      .kpi .box h3{margin:0;font-size:1.3rem}
-      .kpi .box small{color:var(--muted)}
+      input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0, 132, 255, 0.2); }
+      textarea{min-height:70px; resize:vertical}
+      .pill{display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; font-size:.85rem; border:1px solid var(--line); background:#0e141b;}
+      .tag{display:inline-flex; align-items:center; padding: 4px 10px; border-radius:999px; font-size:.85rem; margin:2px; border:1px solid; font-weight:500;}
+      .tag.red{background:rgba(255,77,79,.1); color:var(--red); border-color:rgba(255,77,79,.3)}
+      .tag.amber{background:rgba(255,176,32,.15); color:var(--amber); border-color:rgba(255,176,32,.35)}
+      .tag.green{background:rgba(34,197,94,.12); color:var(--green); border-color:rgba(34,197,94,.3)}
+      .btn.primary{background:var(--accent); color:#fff; border:none; padding:10px 14px; border-radius:10px; cursor:pointer; font-weight: 500;}
+      .kpi{display:grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap:12px;}
+      .kpi .box{background:var(--input-bg); border:1px solid var(--line); padding:12px; border-radius:12px; text-align:center}
+      .kpi .box h3{margin:0; font-size:1.3rem}
+      .kpi .box small{color:var(--muted); font-size: 0.8rem;}
       .status{font-weight:700}
       .status.red{color:var(--red)} .status.amber{color:var(--amber)} .status.green{color:var(--green)}
-      .section-title{margin:20px 0 10px;font-size:1.1rem;font-weight:600;color:#cdd8e4;border-bottom:1px solid var(--line);padding-bottom:8px;}
-      .hint{font-size:.85rem;color:var(--muted);margin-top:8px;}
-      .inline{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-      .divider{height:1px;background:var(--line);margin:10px 0}
-      @media (max-width:600px){.col-3,.col-4,.col-6{grid-column:span 12}}
+      .section-title{margin:24px 0 12px; font-size:1.1rem; font-weight:600; color:#cdd8e4; border-bottom:1px solid var(--line); padding-bottom:8px;}
+      .card > .section-title:first-child { margin-top: 0; }
+      .hint{font-size:.85rem; color:var(--muted); margin-top:8px; text-align: center;}
+      .divider{height:1px; background:var(--line); margin:16px 0}
+      .check-group { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+      .check-label {
+        display: flex; align-items: center; background-color: var(--input-bg); padding: 12px; border-radius: 10px;
+        border: 1px solid var(--line); cursor: pointer; transition: all 0.2s;
+      }
+      .check-label:hover { border-color: var(--accent); }
+      .check-label input { opacity: 0; width: 0; height: 0; }
+      .check-label .checkmark {
+        width: 20px; height: 20px; border: 2px solid var(--muted); border-radius: 5px; margin-right: 12px;
+        display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+      }
+      .check-label .checkmark:after { content: '✓'; font-size: 14px; color: white; opacity: 0; transform: scale(0.5); transition: all 0.2s;}
+      .check-label input:checked ~ .checkmark { background-color: var(--accent); border-color: var(--accent); }
+      .check-label input:checked ~ .checkmark:after { opacity: 1; transform: scale(1); }
+      footer {
+        position: fixed; bottom: 0; left: 0; width: 100%; background: #1a2633;
+        border-top: 1px solid var(--line); padding: 12px 20px;
+        display: flex; align-items: center; justify-content: space-between; gap: 20px; box-sizing: border-box;
+      }
+      .footer-item { color: var(--muted); font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+      .footer-item strong { color: var(--ink); font-weight: 500; }
+      .footer-score { padding: 8px 16px; border-radius: 8px; font-weight: 700; text-align: center;}
+      @media (max-width:700px){
+          .col-4,.col-6,.col-8{grid-column:span 12}
+          footer { flex-wrap: wrap; justify-content: center; text-align: center; padding: 8px; }
+          .footer-item { width: 45%; }
+          .footer-score { width: 100%; margin-top: 8px; }
+      }
     </style>
 </head>
 <body>
@@ -56,131 +84,126 @@
             <div class="col-6"><label for="ptMrn">MRN / URN</label><input id="ptMrn" type="text" placeholder="e.g., 1234567" /></div>
             <div class="col-4"><label for="ptAge">Age</label><input id="ptAge" type="number" min="0" placeholder="Years" /></div>
             <div class="col-4"><label for="ptWt">Weight (kg)</label><input id="ptWt" type="number" step="0.1" min="0" placeholder="kg" /></div>
-            <div class="col-4"><label for="ptLoc">Location/Bed</label><input id="ptLoc" type="text" placeholder="Ward/Bed" /></div>
+            <div class="col-4"><label for="ptLoc">Location/Bed</label><input id="ptLoc" type="text" placeholder="e.g., W4 B12" /></div>
+            <div class="col-12"><label for="ptAdmissionReason">Primary Reason for ICU Admission</label><input id="ptAdmissionReason" type="text" placeholder="e.g., Post-op, Sepsis, Trauma" /></div>
         </div>
     </div>
     <div class="card">
         <div class="kpi">
-            <div class="box"><small>Category</small><h3 id="catText" class="status green">🟢 Low</h3></div>
-            <div class="box"><small>Flags (R/A)</small><h3><span id="redCount">0</span>/<span id="amberCount">0</span></h3></div>
-            <div class="box"><small>Follow-Up</small><h3 id="followUp">24h only</h3></div>
+            <div class="box"><small>Category</small><h3 id="catText" class="status green">🟢 LOW</h3></div>
+            <div class="box"><small>Red Flags</small><h3 id="redCount">0</h3></div>
+            <div class="box"><small>Amber Flags</small><h3 id="amberCount">0</h3></div>
+            <div class="box"><small>Follow-Up</small><h3 id="followUp">24h</h3></div>
         </div>
         <div class="divider"></div>
         <div id="flagList"></div>
     </div>
     <div class="card">
-        <h2 class="section-title">Cognition & Vitals</h2>
+        <h2 class="section-title">Risk Factors</h2>
         <div class="grid">
-            <div class="col-4"><label for="adds">ADDS (0–10)</label><input id="adds" type="number" min="0" max="10" step="1" /></div>
-            <div class="col-4"><label for="gcs">GCS</label><input id="gcs" type="number" min="3" max="15" step="1" /></div>
-            <div class="col-4" style="align-self:end;"><label class="inline"><input id="confused" type="checkbox" /> Confused / muddled</label></div>
-            <div class="col-12"><div class="hint">Delirium/altered cognition (Red) is auto-flagged if Confused or GCS &lt;15.</div></div>
-        </div>
-        <h2 class="section-title">Respiratory & Circulation</h2>
-        <div class="grid">
-            <div class="col-4"><label for="oxMod">Oxygen Modality</label><select id="oxMod"><option value="RA">Room Air</option><option value="NP">Nasal Prongs</option><option value="HFNP">HFNP</option><option value="Other">Other</option></select></div>
-            <div class="col-4 npOnly" style="display:none"><label for="npFlow">NP Flow (L/min)</label><input id="npFlow" type="number" step="0.5" min="0" /></div>
-            <div class="col-4 npOnly" style="display:none"><label for="npPrev">NP Flow 12h ago</label><input id="npPrev" type="number" step="0.5" min="0" placeholder="for 1→2L amber" /></div>
-            <div class="col-12 npOnly" style="display:none"><label class="inline"><input id="np3Last12h" type="checkbox" /> NP ≥3 L/min at any time in last 12h</label></div>
-            <div class="col-4 hfnpOnly" style="display:none"><label for="hfnpFio2">HFNP FiO₂ (%)</label><input id="hfnpFio2" type="number" step="1" min="21" max="100" /></div>
-            <div class="col-4 hfnpOnly" style="display:none"><label for="hfnpFlow">HFNP Flow (L/min)</label><input id="hfnpFlow" type="number" step="1" min="0" /></div>
-            <div class="col-6" style="align-self:end;"><label class="inline"><input id="rapidWean" type="checkbox" /> Rapid wean HFNP → NP in last 12h</label></div>
-            <div class="col-6" style="align-self:end;"><label class="inline"><input id="pressors24h" type="checkbox" /> Vasopressors used in last 24h</label></div>
-            <div class="col-12"><div class="hint">Red FiO₂: NP ≥3L, HFNP ≥40% or ≥40L, or rapid wean. Amber FiO₂: NP 1→2L, HFNP &lt;40%.</div></div>
-        </div>
-        <h2 class="section-title">Labs & Renal</h2>
-        <div class="grid">
-            <div class="col-4"><label for="lactate">Lactate</label><input id="lactate" type="number" step="0.1" min="0" placeholder="mmol/L"/></div>
-            <div class="col-4"><label for="crNow">Current Creatinine</label><input id="crNow" type="number" step="1" min="0" placeholder="μmol/L"/></div>
-            <div class="col-4"><label for="crBase">Baseline Creatinine</label><input id="crBase" type="number" step="1" min="0" placeholder="μmol/L"/></div>
-            <div class="col-4"><label for="cr48h">Creatinine ~48h ago</label><input id="cr48h" type="number" step="1" min="0" placeholder="μmol/L"/></div>
-            <div class="col-4"><label for="uopMl">UOP total (mL)</label><input id="uopMl" type="number" step="1" min="0" /></div>
-            <div class="col-4"><label for="uopHrs">UOP hours</label><input id="uopHrs" type="number" step="1" min="1" /></div>
-            <div class="col-12"><label for="uopRate">Calculated Urine Output</label><input id="uopRate" type="text" placeholder="mL/kg/hr" disabled /></div>
-            <div class="col-12"><div class="hint">Red creatinine if rise ≥26 μmol/L in 48h or ≥1.5× baseline. Red UOP if &lt;0.5 mL/kg/h for ≥6h.</div></div>
-        </div>
-        <h2 class="section-title">Infection</h2>
-        <div class="grid">
-            <div class="col-3"><label for="temp">Temp (°C)</label><input id="temp" type="number" step="0.1" min="30" max="43" /></div>
-            <div class="col-3"><label for="crp">CRP (mg/L)</label><input id="crp" type="number" step="1" min="0" /></div>
-            <div class="col-3"><label for="wcc">WCC (×10⁹/L)</label><input id="wcc" type="number" step="0.1" min="0" /></div>
-            <div class="col-3" style="align-self:end;"><label class="inline"><input id="crpRising" type="checkbox" /> CRP rising</label></div>
-            <div class="col-6"><label class="inline"><input id="clinicalInfect" type="checkbox" /> Clinical signs of infection</label></div>
-            <div class="col-6"><label class="inline"><input id="abxSuspected" type="checkbox" /> On antibiotics for suspected infection</label></div>
-        </div>
-        <h2 class="section-title">Structured Review (A-G)</h2>
-        <div class="grid">
-            <div class="col-6"><label>Electrolytes (K, Mg, Phos, Na)</label><input id="elec" type="text" placeholder="e.g., K 4.2, Mg 0.9" /></div>
-            <div class="col-6"><label>Other Labs (Albumin/Hb)</label><input id="labsOther" type="text" placeholder="e.g., Alb 30, Hb 90" /></div>
-            <div class="col-6"><label>Nutrition</label><input id="nutrition" type="text" placeholder="e.g., PO adequate / NG feeds" /></div>
-            <div class="col-6"><label>Lines & drains</label><input id="lines" type="text" placeholder="e.g., PICC (day 5), IDC patent" /></div>
-            <div class="col-6"><label>Bowel function</label><input id="bowel" type="text" placeholder="e.g., BO x1 today, on aperients" /></div>
-            <div class="col-6"><label>Positioning & MSK</label><input id="msk" type="text" placeholder="e.g., mobilising with 1 assist" /></div>
-            <div class="col-6"><label>Psychosocial / discharge</label><input id="psych" type="text" placeholder="e.g., family aware, criteria pending" /></div>
-            <div class="col-6"><label>Tracheostomy status</label><input id="trach" type="text" placeholder="e.g., cuff deflated, on list" /></div>
-            <div class="col-12"><label class="inline"><input id="srDone" type="checkbox" /> <strong>Structured Review completed</strong></label></div>
+            <div class="col-6">
+                <label>Cognition & Vitals</label>
+                <div class="grid" style="gap: 8px !important; margin-top: 8px;">
+                    <div class="col-6"><input id="adds" type="number" min="0" max="10" placeholder="ADDS" /></div>
+                    <div class="col-6"><input id="gcs" type="number" min="3" max="15" placeholder="GCS" /></div>
+                </div>
+                <div class="check-group">
+                    <label class="check-label"><input id="confused" type="checkbox" /><span class="checkmark"></span>Confused / Muddled</label>
+                </div>
+            </div>
+            <div class="col-6">
+                <label>Circulation & Labs</label>
+                <div class="grid" style="gap: 8px !important; margin-top: 8px;">
+                     <div class="col-12"><input id="lactate" type="number" step="0.1" min="0" placeholder="Lactate (mmol/L)"/></div>
+                </div>
+                 <div class="check-group">
+                    <label class="check-label"><input id="pressors24h" type="checkbox" /><span class="checkmark"></span>Vasopressors in last 24h</label>
+                </div>
+            </div>
+             <div class="col-12">
+                <h2 class="section-title">Respiratory</h2>
+                <div class="grid">
+                    <div class="col-4"><label for="oxMod">Oxygen Modality</label><select id="oxMod"><option value="RA">Room Air</option><option value="NP">Nasal Prongs</option><option value="HFNP">HFNP</option><option value="Other">Other</option></select></div>
+                    <div class="col-4 npOnly" style="display:none"><label for="npFlow">NP Flow (L/min)</label><input id="npFlow" type="number" step="0.5" min="0" /></div>
+                    <div class="col-4 hfnpOnly" style="display:none"><label for="hfnpFio2">HFNP FiO₂ (%)</label><input id="hfnpFio2" type="number" step="1" min="21" max="100" /></div>
+                    <div class="col-4 hfnpOnly" style="display:none"><label for="hfnpFlow">HFNP Flow (L/min)</label><input id="hfnpFlow" type="number" step="1" min="0" /></div>
+                </div>
+                 <div class="check-group">
+                    <label class="check-label"><input id="np3Last12h" type="checkbox" /><span class="checkmark"></span>NP ≥3 L/min at any time in last 12h</label>
+                    <label class="check-label"><input id="rapidWean" type="checkbox" /><span class="checkmark"></span>Rapid wean HFNP → NP in last 12h</label>
+                </div>
+            </div>
+             <div class="col-12">
+                 <h2 class="section-title">Renal & Infection</h2>
+                <div class="grid">
+                    <div class="col-6"><label for="crNow">Current Creatinine</label><input id="crNow" type="number" step="1" min="0" placeholder="μmol/L"/></div>
+                    <div class="col-6"><label for="crBase">Baseline Creatinine</label><input id="crBase" type="number" step="1" min="0" placeholder="μmol/L"/></div>
+                </div>
+                 <div class="check-group">
+                    <label class="check-label"><input id="crRise" type="checkbox" /><span class="checkmark"></span>Creatinine rise ≥26 μmol/L in last 48h</label>
+                    <label class="check-label"><input id="uopLow" type="checkbox" /><span class="checkmark"></span>Urine Output &lt;0.5 mL/kg/hr for ≥6h</label>
+                    <label class="check-label"><input id="infectionConcern" type="checkbox" /><span class="checkmark"></span>Clinical infection concern (Fever, ↑CRP/WCC, etc.)</label>
+                </div>
+            </div>
         </div>
         <h2 class="section-title">Clinical Judgement Override</h2>
         <div class="grid">
-            <div class="col-4"><label>Escalate risk?</label><select id="override"><option value="none">No</option><option value="amber">Yes - Amber concern</option><option value="red">Yes - Red concern</option></select></div>
+            <div class="col-4"><label>Escalate risk?</label><select id="override"><option value="none">No</option><option value="amber">Yes - Amber</option><option value="red">Yes - Red</option></select></div>
             <div class="col-8"><label>Reason for override</label><input id="overrideNote" type="text" placeholder="Optional note..." /></div>
-            <div class="col-12"><div class="hint">Use your clinical judgment to escalate risk if the numbers don't tell the whole story.</div></div>
         </div>
     </div>
     <div class="card">
-        <h2 class="section-title" style="margin-top:0;">Auto‑Generated Summary</h2>
-        <div id="summaryTags" style="margin-bottom:8px"></div>
-        <textarea id="summary" placeholder="Summary will auto-generate here for handover/notes." readonly></textarea>
-        <div class="row" style="margin-top:8px"><button class="btn primary" id="copyBtn">Copy Summary</button></div>
+        <h2 class="section-title">Structured Review (Optional)</h2>
+        <div class="grid">
+            <div class="col-6"><label>Electrolytes / Labs</label><input id="elec" type="text" /></div>
+            <div class="col-6"><label>Nutrition</label><input id="nutrition" type="text" /></div>
+            <div class="col-6"><label>Lines & Drains</label><input id="lines" type="text" /></div>
+            <div class="col-6"><label>Bowel Function</label><input id="bowel" type="text" /></div>
+            <div class="col-6"><label>Mobility / MSK</label><input id="msk" type="text" /></div>
+            <div class="col-6"><label>Psychosocial</label><input id="psych" type="text" /></div>
+        </div>
+    </div>
+    <div class="card">
+        <h2 class="section-title">Auto‑Generated Summary</h2>
+        <textarea id="summary" placeholder="Summary will auto-generate here..." readonly></textarea>
+        <div style="margin-top:12px;"><button class="btn primary" id="copyBtn">Copy Summary</button></div>
     </div>
 </div>
+<footer>
+    <div class="footer-item"><strong>Name:</strong> <span id="footerName">--</span></div>
+    <div class="footer-item"><strong>Location:</strong> <span id="footerLoc">--</span></div>
+    <div class="footer-item"><strong>Reason:</strong> <span id="footerReason">--</span></div>
+    <div id="footerScore" class="footer-score tag green">LOW RISK</div>
+</footer>
 <script>
 // --- UTILITIES ---
 const $ = (id) => document.getElementById(id);
-const debounce = (func, delay) => {
-    let timeout;
-    return (...args) => {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => func.apply(this, args), delay);
-    };
-};
+const debounce = (func, delay) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), delay); }; };
 const num = (v) => { const x = parseFloat(v); return isNaN(x) ? null : x; };
 
 // --- APP STATE & DOM ELEMENTS ---
-const nowEl = $('now');
 const inputs = [
-    'ptName','ptMrn','ptAge','ptWt','ptLoc', 'oxMod','npFlow','np3Last12h','npPrev','hfnpFio2',
-    'hfnpFlow','rapidWean','pressors24h', 'adds','gcs','confused', 'lactate','crBase','crNow',
-    'cr48h','uopMl','uopHrs', 'crp','crpRising','wcc','clinicalInfect','temp','abxSuspected',
-    'override','overrideNote', 'elec','labsOther','nutrition','lines','bowel','msk','psych','trach','srDone'
+    'ptName','ptMrn','ptAge','ptWt','ptLoc','ptAdmissionReason',
+    'oxMod','npFlow','np3Last12h','hfnpFio2','hfnpFlow','rapidWean','pressors24h',
+    'adds','gcs','confused','lactate','crBase','crNow','crRise','uopLow','infectionConcern',
+    'override','overrideNote','elec','nutrition','lines','bowel','msk','psych'
 ];
 
 // --- INITIALIZATION ---
 function initialize() {
-    // Clock
-    setInterval(() => { nowEl.textContent = new Date().toLocaleString('en-AU'); }, 1000);
-    nowEl.textContent = new Date().toLocaleString('en-AU');
-
-    // Oxygen modality fields toggle
-    $('oxMod').addEventListener('change', () => {
-        toggleOxyFields();
-        computeAll();
-    });
+    setInterval(() => { $('now').textContent = new Date().toLocaleString('en-AU'); }, 1000);
+    $('now').textContent = new Date().toLocaleString('en-AU');
+    $('oxMod').addEventListener('change', () => { toggleOxyFields(); computeAll(); });
     toggleOxyFields();
-
-    // Event Listeners for all inputs
     const debouncedCompute = debounce(computeAll, 250);
     inputs.forEach(id => {
-        const el = $(id);
-        if (!el) return;
+        const el = $(id); if (!el) return;
         const eventType = (el.type === 'checkbox' || el.tagName === 'SELECT') ? 'change' : 'input';
         el.addEventListener(eventType, debouncedCompute);
     });
-
-    // Button event listeners
-    $('copyBtn').addEventListener('click', copySummary);
-
-    // Initial calculation
+    $('copyBtn').addEventListener('click', async () => {
+        try { await navigator.clipboard.writeText($('summary').value); alert('Summary copied.'); } catch (e) { alert('Copy failed.'); }
+    });
     computeAll();
 }
 
@@ -190,200 +213,80 @@ function toggleOxyFields() {
     document.querySelectorAll('.hfnpOnly').forEach(el => el.style.display = (mod === 'HFNP') ? '' : 'none');
 }
 
-// --- DATA & STATE MANAGEMENT ---
-function captureState() {
-    const s = {};
-    inputs.forEach(id => {
-        const el = $(id);
-        if (!el) return;
-        s[id] = (el.type === 'checkbox') ? el.checked : el.value;
-    });
-    return s;
-}
-
 // --- CORE CALCULATION LOGIC ---
 function computeAll() {
-    const state = captureState();
-    const redFlags = [];
-    const amberFlags = [];
+    const s = {}; inputs.forEach(id => { const e=$(id); if(e) s[id] = e.type==='checkbox' ? e.checked : e.value; });
+    const red = [], amber = [];
 
-    // Run all flag checks
-    computeFiO2Flags(state, redFlags, amberFlags);
-    computeADDSFlags(state, redFlags, amberFlags);
-    computePressorFlags(state, redFlags);
-    computeNeuroFlags(state, redFlags);
-    computeLactateFlags(state, redFlags, amberFlags);
-    computeCreatinineFlags(state, redFlags, amberFlags);
-    computeUOPFlags(state, redFlags);
-    computeInfectionFlags(state, redFlags);
-    applyOverride(state, redFlags, amberFlags);
-
-    // Update UI
-    updateRiskSummary(redFlags, amberFlags);
-    updateGeneratedSummary(state, redFlags, amberFlags);
-}
-
-// --- FLAG COMPUTATION SUB-FUNCTIONS ---
-function computeFiO2Flags(s, red, amber) {
+    // --- FLAG COMPUTATIONS ---
+    // Resp/Circ
     if (s.oxMod === 'NP') {
         const flow = num(s.npFlow);
-        if (s.np3Last12h || (flow !== null && flow >= 3)) {
-            red.push('FiO₂ escalation: NP ≥3 L/min in last 12h');
-        } else {
-            const prev = num(s.npPrev);
-            if (prev === 1 && flow === 2) {
-                amber.push('FiO₂ escalation: NP 1→2 L/min (last 12h)');
-            }
-        }
+        if (s.np3Last12h || (flow !== null && flow >= 3)) red.push('FiO₂: NP ≥3 L/min');
+        else if (flow > 0 && flow < 3) amber.push('FiO₂: NP 1-2.5 L/min');
     } else if (s.oxMod === 'HFNP') {
-        const fio2 = num(s.hfnpFio2);
-        const flow = num(s.hfnpFlow);
-        if ((fio2 !== null && fio2 >= 40) || (flow !== null && flow >= 40)) {
-            red.push('FiO₂ escalation: HFNP ≥40% or ≥40 L/min');
-        } else if (fio2 !== null && fio2 > 21 && fio2 < 40) {
-            amber.push('FiO₂: HFNP <40%');
-        }
+        const fio2=num(s.hfnpFio2), flow=num(s.hfnpFlow);
+        if ((fio2 && fio2 >= 40) || (flow && flow >= 40)) red.push('FiO₂: HFNP ≥40% or ≥40 L/min');
+        else if (fio2 > 21 || flow > 0) amber.push('On HFNP (low settings)');
     }
-    if (s.rapidWean) red.push('Rapid wean HFNP → NP in last 12h');
-}
-function computeADDSFlags(s, red, amber) {
+    if (s.rapidWean) red.push('Rapid wean HFNP→NP');
+    if (s.pressors24h) red.push('Vasopressors in last 24h');
+    // Neuro
     const adds = num(s.adds);
-    if (adds === null) return;
-    if (adds >= 4) red.push(`ADDS ≥4 (is ${adds})`);
-    else if (adds === 3) amber.push('ADDS = 3');
-}
-function computePressorFlags(s, red) {
-    if (s.pressors24h) red.push('Vasopressors used in last 24h');
-}
-function computeNeuroFlags(s, red) {
-    const gcs = num(s.gcs);
-    if (s.confused) red.push('Delirium/altered cognition: Confused/muddled');
-    if (gcs !== null && gcs < 15) red.push(`Delirium/altered cognition: GCS < 15 (is ${gcs})`);
-}
-function computeLactateFlags(s, red, amber) {
+    if (adds >= 4) red.push(`ADDS ≥4 (is ${adds})`); else if (adds === 3) amber.push('ADDS = 3');
+    if (s.confused) red.push('Altered Cognition: Confused');
+    const gcs = num(s.gcs); if (gcs < 15) red.push(`Altered Cognition: GCS < 15 (is ${gcs})`);
+    // Labs/Renal
     const l = num(s.lactate);
-    if (l === null) return;
-    if (l > 2.5) red.push(`Lactate > 2.5 mmol/L (is ${l})`);
-    else if (l >= 2.0) amber.push(`Lactate 2.0–2.5 mmol/L (is ${l})`);
-}
-function computeCreatinineFlags(s, red, amber) {
-    const base = num(s.crBase), now = num(s.crNow), ago48 = num(s.cr48h);
-    let isRed = false;
-    if (base !== null && now !== null && base > 0 && (now / base) >= 1.5) {
-        red.push(`Creatinine ≥1.5× baseline (${now}/${base} = ${(now/base).toFixed(1)}x)`);
-        isRed = true;
-    }
-    if (ago48 !== null && now !== null && (now - ago48) >= 26) {
-        red.push(`Creatinine rise ≥26 μmol/L in 48h (Δ=${now - ago48})`);
-        isRed = true;
-    }
-    if (!isRed && now !== null && now > 120) {
-        amber.push(`Creatinine >120 μmol/L but stable (is ${now})`);
-    }
-}
-function computeUOPFlags(s, red) {
-    const ml = num(s.uopMl), hrs = num(s.uopHrs), kg = num(s.ptWt);
-    if (ml !== null && hrs !== null && hrs > 0 && kg !== null && kg > 0) {
-        const rate = ml / (kg * hrs);
-        $('uopRate').value = `${rate.toFixed(2)} mL/kg/hr`;
-        if (rate < 0.5 && hrs >= 6) {
-            red.push(`UOP <0.5 mL/kg/h for ≥6h (${rate.toFixed(2)} mL/kg/h over ${hrs}h)`);
-        }
-    } else {
-        $('uopRate').value = '';
-    }
-}
-function computeInfectionFlags(s, red) {
-    const crp = num(s.crp), wcc = num(s.wcc), temp = num(s.temp);
-    if (s.crpRising) red.push('Infection concern: CRP rising');
-    if (crp !== null && crp > 100) red.push(`Infection concern: CRP >100 mg/L (is ${crp})`);
-    if (wcc !== null && s.clinicalInfect && (wcc > 12 || wcc < 4)) red.push(`Infection concern: WCC ${wcc} with clinical signs`);
-    if (temp !== null && temp >= 38) red.push(`Infection concern: Fever ≥38°C (is ${temp}°C)`);
-    if (s.abxSuspected) red.push('Infection concern: Ongoing antibiotics for suspected infection');
-}
-function applyOverride(s, red, amber) {
+    if (l > 2.5) red.push(`Lactate > 2.5 (is ${l})`); else if (l >= 2.0) amber.push(`Lactate 2.0-2.5 (is ${l})`);
+    const base = num(s.crBase), now = num(s.crNow);
+    if (base && now && (now/base) >= 1.5) red.push(`AKI: Creatinine ≥1.5x baseline`);
+    if (s.crRise) red.push('AKI: Creatinine rise ≥26 in 48h');
+    if (s.uopLow) red.push('AKI: Oliguria <0.5ml/kg/hr');
+    if (s.infectionConcern) red.push('Clinical infection concern');
+    // Override
     const note = s.overrideNote ? ` (${s.overrideNote})` : '';
-    if (s.override === 'red') red.push(`Nurse override: Red concern${note}`);
-    if (s.override === 'amber') amber.push(`Nurse override: Amber concern${note}`);
+    if (s.override === 'red') red.push(`Override: Red concern${note}`);
+    if (s.override === 'amber') amber.push(`Override: Amber concern${note}`);
+
+    // --- UI UPDATES ---
+    updateDisplay(s, red, amber);
 }
 
-// --- UI UPDATE FUNCTIONS ---
-function updateRiskSummary(redFlags, amberFlags) {
-    const redCount = redFlags.length;
-    const amberCount = amberFlags.length;
+function updateDisplay(s, red, amber) {
+    const redCount = red.length, amberCount = amber.length;
+    $('redCount').textContent = redCount; $('amberCount').textContent = amberCount;
+    const cat = (redCount > 0) ? {id: 'red', text: '🛑 HIGH', follow: '72h'} :
+                (amberCount > 0) ? {id: 'amber', text: '🟠 MODERATE', follow: '48h'} :
+                {id: 'green', text: '🟢 LOW', follow: '24h'};
 
-    $('redCount').textContent = redCount;
-    $('amberCount').textContent = amberCount;
-
-    const cat = (redCount > 0) ? {id: 'red', text: '🛑 High', follow: '72h + daily'} :
-                (amberCount > 0) ? {id: 'amber', text: '🟠 Moderate', follow: '48h + review'} :
-                {id: 'green', text: '🟢 Low', follow: '24h only'};
-
-    const catEl = $('catText');
-    catEl.textContent = cat.text;
-    catEl.className = 'status ' + cat.id;
+    $('catText').className = 'status ' + cat.id; $('catText').textContent = cat.text;
     $('followUp').textContent = cat.follow;
-
+    
     const makeTag = (txt, cls) => `<span class="tag ${cls}">${txt}</span>`;
-    const flagList = $('flagList');
     if (redCount > 0 || amberCount > 0) {
-        flagList.innerHTML = [...redFlags.map(f => makeTag(f, 'red')), ...amberFlags.map(f => makeTag(f, 'amber'))].join('');
+        $('flagList').innerHTML = [...red.map(f => makeTag(f, 'red')), ...amber.map(f => makeTag(f, 'amber'))].join('');
     } else {
-        flagList.innerHTML = makeTag('No red or amber flags', 'green');
+        $('flagList').innerHTML = makeTag('No risk factors identified', 'green');
     }
-}
-function updateGeneratedSummary(s, redFlags, amberFlags) {
-    const redCount = redFlags.length;
-    const amberCount = amberFlags.length;
-    const catEl = $('catText');
-    const cat = { id: catEl.className.replace('status ', ''), text: catEl.textContent, follow: $('followUp').textContent };
     
-    const makeTag = (txt, cls) => `<span class="tag ${cls}">${txt}</span>`;
-    $('summaryTags').innerHTML = [
-        makeTag(`Category: ${cat.text}`, cat.id),
-        makeTag(`Flags R/A: ${redCount}/${amberCount}`, (redCount > 0) ? 'red' : (amberCount > 0) ? 'amber' : 'green'),
-        makeTag(`Follow-up: ${cat.follow}`, 'green')
-    ].join('');
-
-    const lines = [];
-    const idLine = [
-        s.ptName ? `Patient: ${s.ptName}` : 'Patient: (Unnamed)',
-        s.ptMrn ? `MRN: ${s.ptMrn}` : null,
-        s.ptAge ? `Age: ${s.ptAge}` : null,
-        s.ptLoc ? `Location: ${s.ptLoc}` : null
-    ].filter(Boolean).join(' | ');
-    lines.push(idLine);
-    lines.push(`Risk: ${cat.text} | Flags R/A ${redCount}/${amberCount} | Follow-up: ${cat.follow}`);
-    
-    if (redFlags.length > 0) lines.push('RED FLAGS: ' + redFlags.join('; '));
-    if (amberFlags.length > 0) lines.push('AMBER FLAGS: ' + amberFlags.join('; '));
-    if (redFlags.length === 0 && amberFlags.length === 0) lines.push('No red or amber flags present.');
-
-    const sr = [
-        s.elec ? `Electrolytes: ${s.elec}` : null,
-        s.labsOther ? `Other Labs: ${s.labsOther}` : null,
-        s.nutrition ? `Nutrition: ${s.nutrition}` : null,
-        s.lines ? `Lines/drains: ${s.lines}` : null,
-        s.bowel ? `Bowel: ${s.bowel}` : null,
-        s.msk ? `MSK: ${s.msk}` : null,
-        s.psych ? `Psych/discharge: ${s.psych}` : null,
-        s.trach ? `Tracheostomy: ${s.trach}` : null
-    ].filter(Boolean);
-    lines.push((s.srDone ? 'Structured Review:' : 'Structured Review (INCOMPLETE):') + ' ' + (sr.length ? sr.join(' | ') : 'not documented'));
-    if (!s.srDone) lines.push('→ Please complete the Structured Review checklist.');
-
+    // Summary Text
+    const lines = [ `Patient: ${s.ptName||'--'} | MRN: ${s.ptMrn||'--'} | Location: ${s.ptLoc||'--'}`,
+        `ICU Admission: ${s.ptAdmissionReason || 'Not specified'}`, `---`,
+        `ASSESSMENT: ${cat.text.substring(2)} RISK. Flags R/A: ${redCount}/${amberCount}. Suggested Follow-Up: ${cat.follow}.`];
+    if (red.length) lines.push('RED FLAGS: ' + red.join('; '));
+    if (amber.length) lines.push('AMBER FLAGS: ' + amber.join('; '));
     $('summary').value = lines.join('\n');
+    
+    // Sticky Footer
+    $('footerName').textContent = s.ptName || '--';
+    $('footerLoc').textContent = s.ptLoc || '--';
+    $('footerReason').textContent = s.ptAdmissionReason || '--';
+    const scoreEl = $('footerScore');
+    scoreEl.className = `footer-score tag ${cat.id}`;
+    scoreEl.textContent = `${cat.text.substring(2)} RISK`;
 }
 
-// --- BUTTON ACTIONS ---
-async function copySummary() {
-    try {
-        await navigator.clipboard.writeText($('summary').value);
-        alert('Summary copied to clipboard.');
-    } catch (e) { alert('Copy failed.'); }
-}
-
-// --- START THE APP ---
 document.addEventListener('DOMContentLoaded', initialize);
 </script>
 </body>
