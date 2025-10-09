@@ -1,1409 +1,570 @@
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
-
-<meta charset="utf-8" />
-
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-
-<title>ICU Readmission Risk Tool</title>
-
-<style>
-
-  :root{
-
-    --bg:#0b0f14; --card:#121821; --ink:#e9f0f7; --muted:#a9b7c6; --accent:#4ea1ff;
-
-    --red:#ff4d4f; --amber:#ffb020; --green:#22c55e; --line:#253242;
-
-  }
-
-  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);margin:0;line-height:1.35}
-
-  header{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-
-  header h1{font-size:1.2rem;margin:0;flex:1}
-
-  .container{max-width:1100px;margin:0 auto;padding:16px}
-
-  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}
-
-  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
-
-  .col-6{grid-column:span 6}.col-4{grid-column:span 4}.col-8{grid-column:span 8}.col-12{grid-column:span 12}
-
-  label{display:block;font-size:.9rem;color:var(--muted);margin-bottom:4px}
-
-  input[type="text"], input[type="number"], select, textarea{
-
-    width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);
-
-    background:#0e141b;color:var(--ink);outline:none
-
-  }
-
-  textarea{min-height:70px;resize:vertical}
-
-  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-
-  .pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:.85rem;border:1px solid var(--line);background:#0e141b}
-
-  .switch{display:inline-flex;align-items:center;gap:8px}
-
-  .switch input{accent-color:var(--accent)}
-
-  .tag{display:inline-flex;align-items:center;padding:4px 8px;border-radius:999px;font-size:.8rem;margin:2px;border:1px solid var(--line)}
-
-  .tag.red{background:rgba(255,77,79,.1);color:var(--red);border-color:rgba(255,77,79,.3)}
-
-  .tag.amber{background:rgba(255,176,32,.15);color:var(--amber);border-color:rgba(255,176,32,.35)}
-
-  .tag.green{background:rgba(34,197,94,.12);color:var(--green);border-color:rgba(34,197,94,.3)}
-
-  .btn{background:#152233;color:var(--ink);border:1px solid var(--line);padding:10px 14px;border-radius:10px;cursor:pointer}
-
-  .btn.primary{background:var(--accent);color:#001a33;border:none}
-
-  .btn.warn{background:var(--red);color:white;border:none}
-
-  .btn:disabled{opacity:.6;cursor:not-allowed}
-
-  .kpi{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-
-  .kpi .box{background:#0e141b;border:1px solid var(--line);padding:12px;border-radius:12px;min-width:110px;text-align:center}
-
-  .kpi .box h3{margin:0;font-size:1.3rem}
-
-  .kpi .box small{color:var(--muted)}
-
-  .status{font-weight:700}
-
-  .status.red{color:var(--red)} .status.amber{color:var(--amber)} .status.green{color:var(--green)}
-
-  .section-title{margin:0 0 8px;font-size:1rem;border-left:3px solid var(--line);padding-left:8px;color:#cdd8e4}
-
-  .hint{font-size:.85rem;color:var(--muted)}
-
-  .inline{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-
-  .divider{height:1px;background:var(--line);margin:10px 0}
-
-  .nowrap{white-space:nowrap}
-
-  @media (max-width:900px){.col-6,.col-4,.col-8{grid-column:span 12}}
-
-</style>
-
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ICU Readmission Risk Tool</title>
+    <style>
+      :root{
+        --bg:#0b0f14; --card:#121821; --ink:#e9f0f7; --muted:#a9b7c6; --accent:#4ea1ff;
+        --red:#ff4d4f; --amber:#ffb020; --green:#22c55e; --line:#253242;
+      }
+      html.light-mode {
+        --bg:#f0f2f5; --card:#ffffff; --ink:#1f2937; --muted:#6b7280; --accent:#007bff;
+        --red:#d93025; --amber:#f9ab00; --green:#1e8e3e; --line:#d1d5db;
+      }
+      body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);margin:0;line-height:1.35; transition: background 0.2s, color 0.2s;}
+      header{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+      header h1{font-size:1.2rem;margin:0;flex:1}
+      .container{max-width:1100px;margin:0 auto;padding:16px}
+      .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}
+      .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px; transition: background 0.2s, border-color 0.2s;}
+      .col-6{grid-column:span 6}.col-4{grid-column:span 4}.col-8{grid-column:span 8}.col-12{grid-column:span 12}
+      label{display:block;font-size:.9rem;color:var(--muted);margin-bottom:4px}
+      input[type="text"], input[type="number"], select, textarea{
+        width:100%;padding:10px;border-radius:10px;border:1px solid var(--line); box-sizing: border-box;
+        background:#0e141b;color:var(--ink);outline:none; transition: background 0.2s, color 0.2s, border-color 0.2s;
+      }
+      html.light-mode input, html.light-mode select, html.light-mode textarea { background: #f8f9fa; }
+      textarea{min-height:70px;resize:vertical}
+      .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+      .pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:.85rem;border:1px solid var(--line);background:#0e141b; transition: background 0.2s, border-color 0.2s;}
+      html.light-mode .pill { background: #e9ecef; }
+      .switch{display:inline-flex;align-items:center;gap:8px}
+      .switch input{accent-color:var(--accent)}
+      .tag{display:inline-flex;align-items:center;padding:4px 8px;border-radius:999px;font-size:.8rem;margin:2px;border:1px solid var(--line)}
+      .tag.red{background:rgba(255,77,79,.1);color:var(--red);border-color:rgba(255,77,79,.3)}
+      .tag.amber{background:rgba(255,176,32,.15);color:var(--amber);border-color:rgba(255,176,32,.35)}
+      .tag.green{background:rgba(34,197,94,.12);color:var(--green);border-color:rgba(34,197,94,.3)}
+      html.light-mode .tag.red{background:rgba(217,48,37,.1);border-color:rgba(217,48,37,.3)}
+      html.light-mode .tag.amber{background:rgba(249,171,0,.15);border-color:rgba(249,171,0,.35)}
+      html.light-mode .tag.green{background:rgba(30,142,62,.12);border-color:rgba(30,142,62,.3)}
+      .btn{background:#152233;color:var(--ink);border:1px solid var(--line);padding:10px 14px;border-radius:10px;cursor:pointer; transition: background 0.2s, color 0.2s;}
+      .btn.primary{background:var(--accent);color:#001a33;border:none}
+      .btn.warn{background:var(--red);color:white;border:none}
+      .btn:disabled{opacity:.6;cursor:not-allowed}
+      .kpi{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+      .kpi .box{background:#0e141b;border:1px solid var(--line);padding:12px;border-radius:12px;min-width:110px;text-align:center; transition: background 0.2s, border-color 0.2s;}
+      html.light-mode .kpi .box { background: #f8f9fa; }
+      .kpi .box h3{margin:0;font-size:1.3rem}
+      .kpi .box small{color:var(--muted)}
+      .status{font-weight:700}
+      .status.red{color:var(--red)} .status.amber{color:var(--amber)} .status.green{color:var(--green)}
+      .section-title{margin:10px 0 8px;font-size:1rem;border-left:3px solid var(--accent);padding-left:8px;color:#cdd8e4}
+      html.light-mode .section-title { color: var(--ink); }
+      .hint{font-size:.85rem;color:var(--muted)}
+      .inline{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+      .divider{height:1px;background:var(--line);margin:10px 0}
+      .nowrap{white-space:nowrap}
+      @media (max-width:900px){.col-6,.col-4,.col-8{grid-column:span 12}}
+    </style>
 </head>
-
 <body>
-
 <header>
-
-  <h1>ICU Readmission Risk Tool</h1>
-
-  <span class="pill">🕒 <span id="now"></span></span>
-
-  <span class="pill">🌗 <label class="switch"><input id="darkToggle" type="checkbox" checked> Dark</label></span>
-
-  <button class="btn" id="newBtn">New</button>
-
-  <button class="btn" id="saveBtn">Save</button>
-
-  <button class="btn" id="loadBtn">Load…</button>
-
-  <button class="btn" id="exportBtn">Export JSON</button>
-
-  <button class="btn" id="printBtn">Print/PDF</button>
-
+    <h1>ICU Readmission Risk Tool</h1>
+    <span class="pill">🕒 <span id="now"></span></span>
+    <span class="pill">🌗 <label class="switch"><input id="darkToggle" type="checkbox" checked> Dark Mode</label></span>
+    <button class="btn" id="newBtn">New</button>
+    <button class="btn" id="saveBtn">Save</button>
+    <button class="btn" id="loadBtn">Load…</button>
+    <button class="btn" id="exportBtn">Export JSON</button>
+    <button class="btn" id="printBtn">Print/PDF</button>
 </header>
-
- 
-
 <div class="container">
-
-  <div class="grid">
-
-    <!-- Patient Basics -->
-
-    <div class="card col-6">
-
-      <h2 class="section-title">Patient</h2>
-
-      <div class="grid">
-
-        <div class="col-6">
-
-          <label>Patient Name</label>
-
-          <input id="ptName" type="text" placeholder="e.g., Smith, Alex" />
-
+    <div class="grid">
+        <div class="card col-6">
+            <h2 class="section-title">Patient</h2>
+            <div class="grid">
+                <div class="col-6"><label for="ptName">Patient Name</label><input id="ptName" type="text" placeholder="e.g., Smith, Alex" /></div>
+                <div class="col-6"><label for="ptMrn">MRN / URN</label><input id="ptMrn" type="text" placeholder="e.g., 1234567" /></div>
+                <div class="col-6"><label for="ptDob">DOB (optional)</label><input id="ptDob" type="text" placeholder="YYYY-MM-DD" /></div>
+                <div class="col-3"><label for="ptWt">Weight (kg)</label><input id="ptWt" type="number" step="0.1" min="0" placeholder="kg" /></div>
+                <div class="col-3"><label for="ptLoc">Location/Bed</label><input id="ptLoc" type="text" placeholder="Ward/Bed" /></div>
+            </div>
         </div>
-
-        <div class="col-6">
-
-          <label>MRN / URN</label>
-
-          <input id="ptMrn" type="text" placeholder="e.g., 1234567" />
-
+        <div class="card col-6">
+            <h2 class="section-title">Risk & Follow-Up</h2>
+            <div class="kpi">
+                <div class="box"><small>Category</small><h3 id="catText" class="status green">🟢 Low</h3></div>
+                <div class="box"><small>Flags (R/A)</small><h3><span id="redCount">0</span>/<span id="amberCount">0</span></h3></div>
+                <div class="box"><small>Total Flags</small><h3 id="totalCount">0</h3></div>
+                <div class="box"><small>Follow-Up</small><h3 id="followUp">24h only</h3></div>
+            </div>
+            <div class="divider"></div>
+            <div id="flagList"></div>
         </div>
-
-        <div class="col-6">
-
-          <label>DOB (optional)</label>
-
-          <input id="ptDob" type="text" placeholder="YYYY-MM-DD" />
-
+        <div class="card col-12">
+            <h2 class="section-title">Oxygen & Ventilation</h2>
+            <div class="grid">
+                <div class="col-3"><label for="oxMod">Current Modality</label><select id="oxMod"><option value="RA">Room Air</option><option value="NP">Nasal Prongs (NP)</option><option value="HFNP">HFNP</option><option value="Other">Other</option></select></div>
+                <div class="col-3 npOnly" style="display:none"><label for="npFlow">NP Flow (L/min)</label><input id="npFlow" type="number" step="0.5" min="0" /></div>
+                <div class="col-3 npOnly" style="display:none"><label class="inline"><input id="np3Last12h" type="checkbox" /> NP ≥3 L/min at any time in last 12h</label></div>
+                <div class="col-3 npOnly" style="display:none"><label for="npPrev">NP Flow 12h ago (optional)</label><input id="npPrev" type="number" step="0.5" min="0" placeholder="for 1→2L amber" /></div>
+                <div class="col-3 hfnpOnly" style="display:none"><label for="hfnpFio2">HFNP FiO₂ (%)</label><input id="hfnpFio2" type="number" step="1" min="21" max="100" /></div>
+                <div class="col-3 hfnpOnly" style="display:none"><label for="hfnpFlow">HFNP Flow (L/min)</label><input id="hfnpFlow" type="number" step="1" min="0" /></div>
+                <div class="col-3"><label class="inline"><input id="rapidWean" type="checkbox" /> Rapid wean HFNP → NP in last 12h</label></div>
+                <div class="col-3"><label class="inline"><input id="pressors24h" type="checkbox" /> Vasopressors used in last 24h</label></div>
+            </div>
+            <div class="hint">Red FiO₂ escalation: NP ≥3 L/min (last 12h), HFNP ≥40% or ≥40 L/min, or rapid wean HFNP→NP. Amber FiO₂: NP 1→2 L/min (last 12h), HFNP &lt;40%.</div>
         </div>
-
-        <div class="col-3">
-
-          <label>Weight (kg)</label>
-
-          <input id="ptWt" type="number" step="0.1" min="0" placeholder="kg" />
-
+        <div class="card col-6">
+            <h2 class="section-title">ADDS & Cognition</h2>
+            <div class="grid">
+                <div class="col-4"><label for="adds">ADDS (0–10)</label><input id="adds" type="number" min="0" max="10" step="1" /></div>
+                <div class="col-4"><label for="gcs">GCS</label><input id="gcs" type="number" min="3" max="15" step="1" /></div>
+                <div class="col-4"><label class="inline"><input id="confused" type="checkbox" /> Confused / muddled</label></div>
+            </div>
+            <div class="hint">Delirium/altered cognition (Red) is auto-flagged if Confused or GCS &lt;15.</div>
         </div>
-
-        <div class="col-3">
-
-          <label>Location/Bed</label>
-
-          <input id="ptLoc" type="text" placeholder="Ward/Bed" />
-
+        <div class="card col-6">
+            <h2 class="section-title">Labs & Renal</h2>
+            <div class="grid">
+                <div class="col-3"><label for="lactate">Lactate (mmol/L)</label><input id="lactate" type="number" step="0.1" min="0" /></div>
+                <div class="col-3"><label for="crBase">Creatinine baseline (μmol/L)</label><input id="crBase" type="number" step="1" min="0" /></div>
+                <div class="col-3"><label for="crNow">Creatinine current (μmol/L)</label><input id="crNow" type="number" step="1" min="0" /></div>
+                <div class="col-3"><label for="cr48h">Creatinine ~48h ago (μmol/L)</label><input id="cr48h" type="number" step="1" min="0" /></div>
+            </div>
+            <div class="grid" style="margin-top:8px">
+                <div class="col-4"><label for="uopMl">UOP total (mL)</label><input id="uopMl" type="number" step="1" min="0" /></div>
+                <div class="col-4"><label for="uopHrs">UOP hours</label><input id="uopHrs" type="number" step="1" min="1" /></div>
+                <div class="col-4"><label for="uopRate">Calculated mL/kg/h</label><input id="uopRate" type="text" disabled /></div>
+            </div>
+            <div class="hint">Red creatinine if rise ≥26 μmol/L in 48h or ≥1.5× baseline. Red UOP if &lt;0.5 mL/kg/h for ≥6h.</div>
         </div>
-
-      </div>
-
+        <div class="card col-12">
+            <h2 class="section-title">Infection</h2>
+            <div class="grid">
+                <div class="col-2"><label for="crp">CRP (mg/L)</label><input id="crp" type="number" step="1" min="0" /></div>
+                <div class="col-2"><label class="inline"><input id="crpRising" type="checkbox" /> CRP rising</label></div>
+                <div class="col-2"><label for="wcc">WCC (×10⁹/L)</label><input id="wcc" type="number" step="0.1" min="0" /></div>
+                <div class="col-3"><label class="inline"><input id="clinicalInfect" type="checkbox" /> Clinical signs of infection</label></div>
+                <div class="col-3"><label for="temp">Temp (°C)</label><input id="temp" type="number" step="0.1" min="30" max="43" /></div>
+                <div class="col-3"><label class="inline"><input id="abxSuspected" type="checkbox" /> On antibiotics for suspected infection</label></div>
+            </div>
+            <div class="hint">Any of: CRP rising or &gt;100; WCC &gt;12 or &lt;4 with clinical signs; Temp ≥38; ongoing antibiotics → Red infection concern.</div>
+        </div>
+        <div class="card col-6">
+            <h2 class="section-title">Nurse Override</h2>
+            <div class="row">
+                <select id="override" style="flex:1;"><option value="none">None</option><option value="amber">Amber concern</option><option value="red">Red concern</option></select>
+                <input id="overrideNote" type="text" placeholder="Optional note (why overriding)" style="flex:2;" />
+            </div>
+            <div class="hint">Use your clinical judgment to escalate risk if concerned.</div>
+        </div>
+        <div class="card col-6">
+            <h2 class="section-title">Structured Review (mandatory)</h2>
+            <div class="grid">
+                <div class="col-6"><label for="elec">Electrolytes (K, Mg, Phos, Na)</label><input id="elec" type="text" placeholder="e.g., K 4.2, Mg 0.9, Phos 1.0, Na 139" /></div>
+                <div class="col-6"><label for="labsOther">WCC/CRP/Albumin/Hb (if relevant)</label><input id="labsOther" type="text" placeholder="e.g., Alb 30, Hb 90" /></div>
+                <div class="col-6"><label for="nutrition">Nutrition</label><input id="nutrition" type="text" placeholder="e.g., PO adequate / NG feeds / TPN" /></div>
+                <div class="col-6"><label for="lines">Lines & drains</label><input id="lines" type="text" placeholder="e.g., PICC (day 5), IDC patent" /></div>
+                <div class="col-6"><label for="bowel">Bowel function</label><input id="bowel" type="text" placeholder="e.g., BO x1 today, on aperients" /></div>
+                <div class="col-6"><label for="msk">Positioning & MSK</label><input id="msk" type="text" placeholder="e.g., mobilising with 1 assist / turns 2-hourly" /></div>
+                <div class="col-6"><label for="psych">Psychosocial / discharge readiness</label><input id="psych" type="text" placeholder="e.g., family aware, criteria pending" /></div>
+                <div class="col-6"><label for="trach">Tracheostomy status</label><input id="trach" type="text" placeholder="e.g., cuff deflated, on trache list, decannulation plan" /></div>
+                <div class="col-12"><label class="inline"><input id="srDone" type="checkbox" /> Structured Review completed</label></div>
+            </div>
+        </div>
+        <div class="card col-12">
+            <h2 class="section-title">Auto‑Generated Summary</h2>
+            <div id="summaryTags" style="margin-bottom:8px"></div>
+            <textarea id="summary" placeholder="Summary will auto-generate here for handover/notes." readonly></textarea>
+            <div class="row" style="margin-top:8px"><button class="btn primary" id="copyBtn">Copy Summary</button></div>
+        </div>
     </div>
-
- 
-
-    <!-- Risk Summary -->
-
-    <div class="card col-6">
-
-      <h2 class="section-title">Risk & Follow-Up</h2>
-
-      <div class="kpi">
-
-        <div class="box">
-
-          <small>Category</small>
-
-          <h3 id="catText" class="status green">🟢 Low</h3>
-
-        </div>
-
-        <div class="box">
-
-          <small>Flags (R/A)</small>
-
-          <h3><span id="redCount">0</span>/<span id="amberCount">0</span></h3>
-
-        </div>
-
-        <div class="box">
-
-          <small>Total Flags</small>
-
-          <h3 id="totalCount">0</h3>
-
-        </div>
-
-        <div class="box">
-
-          <small>Follow-Up</small>
-
-          <h3 id="followUp">24h only</h3>
-
-        </div>
-
-      </div>
-
-      <div class="divider"></div>
-
-      <div id="flagList"></div>
-
-    </div>
-
- 
-
-    <!-- Oxygen & Ventilation -->
-
-    <div class="card col-12">
-
-      <h2 class="section-title">Oxygen & Ventilation</h2>
-
-      <div class="grid">
-
-        <div class="col-3">
-
-          <label>Current Modality</label>
-
-          <select id="oxMod">
-
-            <option value="RA">Room Air</option>
-
-            <option value="NP">Nasal Prongs (NP)</option>
-
-            <option value="HFNP">HFNP</option>
-
-            <option value="Other">Other</option>
-
-          </select>
-
-        </div>
-
- 
-
-        <!-- NP fields -->
-
-        <div class="col-3 npOnly" style="display:none">
-
-          <label>NP Flow (L/min)</label>
-
-          <input id="npFlow" type="number" step="0.5" min="0" />
-
-        </div>
-
-        <div class="col-3 npOnly" style="display:none">
-
-          <label class="inline">
-
-            <input id="np3Last12h" type="checkbox" />
-
-            NP ≥3 L/min at any time in last 12h
-
-          </label>
-
-        </div>
-
-        <div class="col-3 npOnly" style="display:none">
-
-          <label>NP Flow 12h ago (optional)</label>
-
-          <input id="npPrev" type="number" step="0.5" min="0" placeholder="for 1→2L amber" />
-
-        </div>
-
- 
-
-        <!-- HFNP fields -->
-
-        <div class="col-3 hfnpOnly" style="display:none">
-
-          <label>HFNP FiO₂ (%)</label>
-
-          <input id="hfnpFio2" type="number" step="1" min="21" max="100" />
-
-        </div>
-
-        <div class="col-3 hfnpOnly" style="display:none">
-
-          <label>HFNP Flow (L/min)</label>
-
-          <input id="hfnpFlow" type="number" step="1" min="0" />
-
-        </div>
-
-        <div class="col-3">
-
-          <label class="inline">
-
-            <input id="rapidWean" type="checkbox" />
-
-            Rapid wean HFNP → NP in last 12h
-
-          </label>
-
-        </div>
-
-        <div class="col-3">
-
-          <label class="inline">
-
-            <input id="pressors24h" type="checkbox" />
-
-            Vasopressors used in last 24h
-
-          </label>
-
-        </div>
-
-      </div>
-
-      <div class="hint">Red FiO₂ escalation: NP ≥3 L/min (last 12h), HFNP ≥40% or ≥40 L/min, or rapid wean HFNP→NP. Amber FiO₂: NP 1→2 L/min (last 12h), HFNP &lt;40%.</div>
-
-    </div>
-
- 
-
-    <!-- ADDS & Neuro -->
-
-    <div class="card col-6">
-
-      <h2 class="section-title">ADDS & Cognition</h2>
-
-      <div class="grid">
-
-        <div class="col-4">
-
-          <label>ADDS (0–10)</label>
-
-          <input id="adds" type="number" min="0" max="10" step="1" />
-
-        </div>
-
-        <div class="col-4">
-
-          <label>GCS</label>
-
-          <input id="gcs" type="number" min="3" max="15" step="1" />
-
-        </div>
-
-        <div class="col-4">
-
-          <label class="inline">
-
-            <input id="confused" type="checkbox" />
-
-            Confused / muddled
-
-          </label>
-
-        </div>
-
-      </div>
-
-      <div class="hint">Delirium/altered cognition (Red) is auto-flagged if Confused or GCS &lt;15.</div>
-
-    </div>
-
- 
-
-    <!-- Labs & Renal -->
-
-    <div class="card col-6">
-
-      <h2 class="section-title">Labs & Renal</h2>
-
-      <div class="grid">
-
-        <div class="col-3">
-
-          <label>Lactate (mmol/L)</label>
-
-          <input id="lactate" type="number" step="0.1" min="0" />
-
-        </div>
-
-        <div class="col-3">
-
-          <label>Creatinine baseline (μmol/L)</label>
-
-          <input id="crBase" type="number" step="1" min="0" />
-
-        </div>
-
-        <div class="col-3">
-
-          <label>Creatinine current (μmol/L)</label>
-
-          <input id="crNow" type="number" step="1" min="0" />
-
-        </div>
-
-        <div class="col-3">
-
-          <label>Creatinine ~48h ago (μmol/L)</label>
-
-          <input id="cr48h" type="number" step="1" min="0" />
-
-        </div>
-
-      </div>
-
-      <div class="grid" style="margin-top:8px">
-
-        <div class="col-4">
-
-          <label>UOP total (mL)</label>
-
-          <input id="uopMl" type="number" step="1" min="0" />
-
-        </div>
-
-        <div class="col-4">
-
-          <label>UOP hours</label>
-
-          <input id="uopHrs" type="number" step="1" min="1" />
-
-        </div>
-
-        <div class="col-4">
-
-          <label>Calculated mL/kg/h</label>
-
-          <input id="uopRate" type="text" disabled />
-
-        </div>
-
-      </div>
-
-      <div class="hint">Red creatinine if rise ≥26 μmol/L in 48h or ≥1.5× baseline. Red UOP if &lt;0.5 mL/kg/h for ≥6h.</div>
-
-    </div>
-
- 
-
-    <!-- Infection -->
-
-    <div class="card col-12">
-
-      <h2 class="section-title">Infection</h2>
-
-      <div class="grid">
-
-        <div class="col-2">
-
-          <label>CRP (mg/L)</label>
-
-          <input id="crp" type="number" step="1" min="0" />
-
-        </div>
-
-        <div class="col-2">
-
-          <label class="inline">
-
-            <input id="crpRising" type="checkbox" />
-
-            CRP rising
-
-          </label>
-
-        </div>
-
-        <div class="col-2">
-
-          <label>WCC (×10⁹/L)</label>
-
-          <input id="wcc" type="number" step="0.1" min="0" />
-
-        </div>
-
-        <div class="col-3">
-
-          <label class="inline">
-
-            <input id="clinicalInfect" type="checkbox" />
-
-            Clinical signs of infection
-
-          </label>
-
-        </div>
-
-        <div class="col-3">
-
-          <label>Temp (°C)</label>
-
-          <input id="temp" type="number" step="0.1" min="30" max="43" />
-
-        </div>
-
-        <div class="col-3">
-
-          <label class="inline">
-
-            <input id="abxSuspected" type="checkbox" />
-
-            On antibiotics for suspected infection
-
-          </label>
-
-        </div>
-
-      </div>
-
-      <div class="hint">Any of: CRP rising or &gt;100; WCC &gt;12 or &lt;4 with clinical signs; Temp ≥38; ongoing antibiotics → Red infection concern.</div>
-
-    </div>
-
- 
-
-    <!-- Nurse Override -->
-
-    <div class="card col-6">
-
-      <h2 class="section-title">Nurse Override</h2>
-
-      <div class="row">
-
-        <select id="override">
-
-          <option value="none">None</option>
-
-          <option value="amber">Amber concern</option>
-
-          <option value="red">Red concern</option>
-
-        </select>
-
-        <input id="overrideNote" type="text" placeholder="Optional note (why overriding)" />
-
-      </div>
-
-      <div class="hint">Use your clinical judgment to escalate risk if concerned.</div>
-
-    </div>
-
- 
-
-    <!-- Structured Review -->
-
-    <div class="card col-6">
-
-      <h2 class="section-title">Structured Review (mandatory)</h2>
-
-      <div class="grid">
-
-        <div class="col-6">
-
-          <label>Electrolytes (K, Mg, Phos, Na)</label>
-
-          <input id="elec" type="text" placeholder="e.g., K 4.2, Mg 0.9, Phos 1.0, Na 139" />
-
-        </div>
-
-        <div class="col-6">
-
-          <label>WCC/CRP/Albumin/Hb (if relevant)</label>
-
-          <input id="labsOther" type="text" placeholder="e.g., Alb 30, Hb 90" />
-
-        </div>
-
-        <div class="col-6">
-
-          <label>Nutrition</label>
-
-          <input id="nutrition" type="text" placeholder="e.g., PO adequate / NG feeds / TPN" />
-
-        </div>
-
-        <div class="col-6">
-
-          <label>Lines & drains</label>
-
-          <input id="lines" type="text" placeholder="e.g., PICC (day 5), IDC patent" />
-
-        </div>
-
-        <div class="col-6">
-
-          <label>Bowel function</label>
-
-          <input id="bowel" type="text" placeholder="e.g., BO x1 today, on aperients" />
-
-        </div>
-
-        <div class="col-6">
-
-          <label>Positioning & MSK</label>
-
-          <input id="msk" type="text" placeholder="e.g., mobilising with 1 assist / turns 2-hourly" />
-
-        </div>
-
-        <div class="col-6">
-
-          <label>Psychosocial / discharge readiness</label>
-
-          <input id="psych" type="text" placeholder="e.g., family aware, criteria pending" />
-
-        </div>
-
-        <div class="col-6">
-
-          <label>Tracheostomy status</label>
-
-          <input id="trach" type="text" placeholder="e.g., cuff deflated, on trache list, decannulation plan" />
-
-        </div>
-
-        <div class="col-12">
-
-          <label class="inline">
-
-            <input id="srDone" type="checkbox" />
-
-            Structured Review completed
-
-          </label>
-
-        </div>
-
-      </div>
-
-    </div>
-
- 
-
-    <!-- Summary -->
-
-    <div class="card col-12">
-
-      <h2 class="section-title">Auto‑Generated Summary</h2>
-
-      <div id="summaryTags" style="margin-bottom:8px"></div>
-
-      <textarea id="summary" placeholder="Summary will auto-generate here for handover/notes." readonly></textarea>
-
-      <div class="row" style="margin-top:8px">
-
-        <button class="btn primary" id="copyBtn">Copy Summary</button>
-
-      </div>
-
-    </div>
-
-  </div>
-
 </div>
-
- 
-
 <script>
-
-  // Utility: DOM
-
-  const $ = (id) => document.getElementById(id);
-
-  const nowEl = $('now');
-
-  const darkToggle = $('darkToggle');
-
- 
-
-  // Initialize timestamp
-
-  function tickNow(){
-
-    const d = new Date();
-
-    nowEl.textContent = d.toLocaleString();
-
-  }
-
-  setInterval(tickNow, 1000); tickNow();
-
- 
-
-  // Dark mode (default on)
-
-  darkToggle.addEventListener('change', () => {
-
-    document.documentElement.style.filter = darkToggle.checked ? 'none' : 'invert(1) hue-rotate(180deg)';
-
-  });
-
- 
-
-  // Show/hide modality fields
-
-  function toggleOxyFields(){
-
-    const mod = $('oxMod').value;
-
-    document.querySelectorAll('.npOnly').forEach(el => el.style.display = (mod==='NP') ? '' : 'none');
-
-    document.querySelectorAll('.hfnpOnly').forEach(el => el.style.display = (mod==='HFNP') ? '' : 'none');
-
-  }
-
-  $('oxMod').addEventListener('change', () => { toggleOxyFields(); computeAll(); });
-
-  toggleOxyFields();
-
- 
-
-  // Inputs affecting calc
-
-  const inputs = [
-
-    'ptName','ptMrn','ptDob','ptWt','ptLoc',
-
-    'oxMod','npFlow','np3Last12h','npPrev','hfnpFio2','hfnpFlow','rapidWean','pressors24h',
-
-    'adds','gcs','confused',
-
-    'lactate','crBase','crNow','cr48h','uopMl','uopHrs',
-
-    'crp','crpRising','wcc','clinicalInfect','temp','abxSuspected',
-
-    'override','overrideNote',
-
-    'elec','labsOther','nutrition','lines','bowel','msk','psych','trach','srDone'
-
-  ];
-
-  inputs.forEach(id=>{
-
-    const el = $(id);
-
-    if(!el) return;
-
-    el.addEventListener((el.type==='checkbox' || el.tagName==='SELECT')?'change':'input', computeAll);
-
-  });
-
- 
-
-  function num(v){ const x = parseFloat(v); return isNaN(x) ? null : x; }
-
- 
-
-  function computeFiO2Flags(state, redFlags, amberFlags){
-
-    const { oxMod, npFlow, np3Last12h, npPrev, hfnpFio2, hfnpFlow, rapidWean } = state;
-
-    if(oxMod === 'NP'){
-
-      const flow = num(npFlow) ?? 0;
-
-      if (np3Last12h || flow >= 3) {
-
-        redFlags.push('FiO₂ escalation: NP ≥3 L/min in last 12h');
-
-      } else {
-
-        const prev = num(npPrev);
-
-        if (prev === 1 && flow === 2) {
-
-          amberFlags.push('FiO₂ escalation: NP 1→2 L/min (last 12h)');
-
-        }
-
-      }
-
-    }
-
-    if(oxMod === 'HFNP'){
-
-      const fio2 = num(hfnpFio2) ?? 21;
-
-      const flow = num(hfnpFlow) ?? 0;
-
-      if (fio2 >= 40 || flow >= 40) {
-
-        redFlags.push('FiO₂ escalation: HFNP ≥40% or ≥40 L/min');
-
-      } else if (fio2 > 0 && fio2 < 40) {
-
-        amberFlags.push('FiO₂: HFNP &lt;40%');
-
-      }
-
-    }
-
-    if(rapidWean){
-
-      redFlags.push('Rapid wean HFNP → NP in last 12h');
-
-    }
-
-  }
-
- 
-
-  function computeADDSFlags(state, redFlags, amberFlags){
-
-    const adds = num(state.adds);
-
-    if(adds != null){
-
-      if (adds >= 4) redFlags.push(`ADDS ≥4 (ADDS=${adds})`);
-
-      else if (adds === 3) amberFlags.push('ADDS = 3');
-
-    }
-
-  }
-
- 
-
-  function computePressorFlags(state, redFlags){
-
-    if(state.pressors24h) redFlags.push('Vasopressors used in last 24h');
-
-  }
-
- 
-
-  function computeNeuroFlags(state, redFlags){
-
-    const g = num(state.gcs);
-
-    const confused = !!state.confused;
-
-    if (confused) redFlags.push('Delirium/altered cognition: Confused/muddled');
-
-    if (g != null && g < 15) redFlags.push(`Delirium/altered cognition: GCS < 15 (GCS=${g})`);
-
-  }
-
- 
-
-  function computeLactateFlags(state, redFlags, amberFlags){
-
-    const l = num(state.lactate);
-
-    if(l == null) return;
-
-    if (l > 2.5) redFlags.push(`Lactate > 2.5 mmol/L (=${l})`);
-
-    else if (l >= 2.0) amberFlags.push(`Lactate 2.0–2.5 mmol/L (=${l})`);
-
-  }
-
- 
-
-  function computeCreatinineFlags(state, redFlags, amberFlags){
-
-    const base = num(state.crBase);
-
-    const now = num(state.crNow);
-
-    const ago48 = num(state.cr48h);
-
- 
-
-    let red = false;
-
-    if(base != null && now != null && base > 0){
-
-      const ratio = now / base;
-
-      if (ratio >= 1.5) { red = true; redFlags.push(`Creatinine ≥1.5× baseline (${now} / ${base} = ${ratio.toFixed(2)}×)`); }
-
-    }
-
-    if(ago48 != null && now != null){
-
-      const delta = now - ago48;
-
-      if (delta >= 26) { red = true; redFlags.push(`Creatinine rise ≥26 μmol/L in 48h (Δ=${delta})`); }
-
-    }
-
-    if(!red && now != null && now > 120){
-
-      amberFlags.push(`Creatinine >120 μmol/L but stable (Cr=${now})`);
-
-    }
-
-  }
-
- 
-
-  function computeUOPFlags(state, redFlags){
-
-    const ml = num(state.uopMl);
-
-    const hrs = num(state.uopHrs);
-
-    const kg  = num(state.ptWt);
-
-    let rateTxt = '';
-
-    if(ml!=null && hrs!=null && hrs>0 && kg!=null && kg>0){
-
-      const rate = ml / (kg * hrs);
-
-      $('uopRate').value = rate.toFixed(2);
-
-      rateTxt = rate.toFixed(2);
-
-      if (rate < 0.5 && hrs >= 6) {
-
-        redFlags.push(`UOP <0.5 mL/kg/h for ≥6h (=${rateTxt} mL/kg/h over ${hrs}h)`);
-
-      }
-
-    } else {
-
-      $('uopRate').value = '';
-
-    }
-
-  }
-
- 
-
-  function computeInfectionFlags(state, redFlags){
-
-    const crp = num(state.crp);
-
-    const crpRising = !!state.crpRising;
-
-    const wcc = num(state.wcc);
-
-    const clin = !!state.clinicalInfect;
-
-    const t = num(state.temp);
-
-    const abx = !!state.abxSuspected;
-
- 
-
-    if (crpRising) redFlags.push('Infection concern: CRP rising');
-
-    if (crp != null && crp > 100) redFlags.push(`Infection concern: CRP >100 mg/L (=${crp})`);
-
-    if (wcc != null && clin && (wcc > 12 || wcc < 4)) redFlags.push(`Infection concern: WCC ${wcc} with clinical signs`);
-
-    if (t != null && t >= 38) redFlags.push(`Infection concern: Fever ≥38°C (=${t}°C)`);
-
-    if (abx) redFlags.push('Infection concern: Ongoing antibiotics for suspected infection');
-
-  }
-
- 
-
-  function applyOverride(state, redFlags, amberFlags){
-
-    if(state.override === 'red') redFlags.push('Nurse override: Red concern' + (state.overrideNote?` (${state.overrideNote})`:'' ));
-
-    if(state.override === 'amber') amberFlags.push('Nurse override: Amber concern' + (state.overrideNote?` (${state.overrideNote})`:'' ));
-
-  }
-
- 
-
-  function determineCategory(redCount, amberCount){
-
-    if (redCount > 0) return {cat:'red', text:'🛑 High', follow:'72h + daily review'};
-
-    if (amberCount > 0) return {cat:'amber', text:'🟠 Moderate', follow:'48h + reassess'};
-
-    return {cat:'green', text:'🟢 Low', follow:'24h only'};
-
-  }
-
- 
-
-  function captureState(){
-
-    const s = {};
-
-    inputs.forEach(id=>{
-
-      const el = $(id); if(!el) return;
-
-      if (el.type === 'checkbox') s[id] = el.checked;
-
-      else s[id] = el.value;
-
+// --- UTILITIES ---
+const $ = (id) => document.getElementById(id);
+const debounce = (func, delay) => {
+    let timeout;
+    return (...args) => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), delay);
+    };
+};
+const num = (v) => { const x = parseFloat(v); return isNaN(x) ? null : x; };
+
+// --- APP STATE & DOM ELEMENTS ---
+const nowEl = $('now');
+const darkToggle = $('darkToggle');
+const inputs = [
+    'ptName','ptMrn','ptDob','ptWt','ptLoc', 'oxMod','npFlow','np3Last12h','npPrev','hfnpFio2',
+    'hfnpFlow','rapidWean','pressors24h', 'adds','gcs','confused', 'lactate','crBase','crNow',
+    'cr48h','uopMl','uopHrs', 'crp','crpRising','wcc','clinicalInfect','temp','abxSuspected',
+    'override','overrideNote', 'elec','labsOther','nutrition','lines','bowel','msk','psych','trach','srDone'
+];
+
+// --- INITIALIZATION ---
+function initialize() {
+    // Clock
+    setInterval(() => { nowEl.textContent = new Date().toLocaleString('en-AU'); }, 1000);
+    nowEl.textContent = new Date().toLocaleString('en-AU');
+
+    // Theme toggle
+    darkToggle.addEventListener('change', () => {
+        document.documentElement.classList.toggle('light-mode', !darkToggle.checked);
     });
 
+    // Oxygen modality fields toggle
+    $('oxMod').addEventListener('change', () => {
+        toggleOxyFields();
+        computeAll();
+    });
+    toggleOxyFields();
+
+    // Event Listeners for all inputs
+    const debouncedCompute = debounce(computeAll, 250);
+    inputs.forEach(id => {
+        const el = $(id);
+        if (!el) return;
+        const eventType = (el.type === 'checkbox' || el.tagName === 'SELECT') ? 'change' : 'input';
+        el.addEventListener(eventType, debouncedCompute);
+    });
+
+    // Button event listeners
+    $('copyBtn').addEventListener('click', copySummary);
+    $('printBtn').addEventListener('click', () => window.print());
+    $('newBtn').addEventListener('click', clearForm);
+    $('saveBtn').addEventListener('click', saveState);
+    $('loadBtn').addEventListener('click', loadState);
+    $('exportBtn').addEventListener('click', exportState);
+
+    // Initial calculation
+    computeAll();
+}
+
+function toggleOxyFields() {
+    const mod = $('oxMod').value;
+    document.querySelectorAll('.npOnly').forEach(el => el.style.display = (mod === 'NP') ? '' : 'none');
+    document.querySelectorAll('.hfnpOnly').forEach(el => el.style.display = (mod === 'HFNP') ? '' : 'none');
+}
+
+// --- DATA & STATE MANAGEMENT ---
+function captureState() {
+    const s = {};
+    inputs.forEach(id => {
+        const el = $(id);
+        if (!el) return;
+        s[id] = (el.type === 'checkbox') ? el.checked : el.value;
+    });
     return s;
+}
 
-  }
+function applyState(state) {
+    inputs.forEach(id => {
+        if (!(id in state)) return;
+        const el = $(id);
+        if (!el) return;
+        if (el.type === 'checkbox') {
+            el.checked = !!state[id];
+        } else {
+            el.value = state[id];
+        }
+    });
+    toggleOxyFields();
+    computeAll();
+}
 
- 
-
-  function computeAll(){
-
+// --- CORE CALCULATION LOGIC ---
+function computeAll() {
     const state = captureState();
-
- 
-
-    // Flags
-
     const redFlags = [];
-
     const amberFlags = [];
 
- 
-
+    // Run all flag checks
     computeFiO2Flags(state, redFlags, amberFlags);
-
     computeADDSFlags(state, redFlags, amberFlags);
-
     computePressorFlags(state, redFlags);
-
     computeNeuroFlags(state, redFlags);
-
     computeLactateFlags(state, redFlags, amberFlags);
-
     computeCreatinineFlags(state, redFlags, amberFlags);
-
     computeUOPFlags(state, redFlags);
-
     computeInfectionFlags(state, redFlags);
-
     applyOverride(state, redFlags, amberFlags);
 
- 
+    // Update UI
+    updateRiskSummary(redFlags, amberFlags);
+    updateGeneratedSummary(state, redFlags, amberFlags);
+}
 
-    // Counts & category
+// --- FLAG COMPUTATION SUB-FUNCTIONS ---
+function computeFiO2Flags(s, red, amber) {
+    if (s.oxMod === 'NP') {
+        const flow = num(s.npFlow);
+        if (s.np3Last12h || (flow !== null && flow >= 3)) {
+            red.push('FiO₂ escalation: NP ≥3 L/min in last 12h');
+        } else {
+            const prev = num(s.npPrev);
+            if (prev === 1 && flow === 2) {
+                amber.push('FiO₂ escalation: NP 1→2 L/min (last 12h)');
+            }
+        }
+    } else if (s.oxMod === 'HFNP') {
+        const fio2 = num(s.hfnpFio2);
+        const flow = num(s.hfnpFlow);
+        if ((fio2 !== null && fio2 >= 40) || (flow !== null && flow >= 40)) {
+            red.push('FiO₂ escalation: HFNP ≥40% or ≥40 L/min');
+        } else if (fio2 !== null && fio2 > 21 && fio2 < 40) {
+            amber.push('FiO₂: HFNP <40%');
+        }
+    }
+    if (s.rapidWean) red.push('Rapid wean HFNP → NP in last 12h');
+}
 
+function computeADDSFlags(s, red, amber) {
+    const adds = num(s.adds);
+    if (adds === null) return;
+    if (adds >= 4) red.push(`ADDS ≥4 (is ${adds})`);
+    else if (adds === 3) amber.push('ADDS = 3');
+}
+
+function computePressorFlags(s, red) {
+    if (s.pressors24h) red.push('Vasopressors used in last 24h');
+}
+
+function computeNeuroFlags(s, red) {
+    const gcs = num(s.gcs);
+    if (s.confused) red.push('Delirium/altered cognition: Confused/muddled');
+    if (gcs !== null && gcs < 15) red.push(`Delirium/altered cognition: GCS < 15 (is ${gcs})`);
+}
+
+function computeLactateFlags(s, red, amber) {
+    const l = num(s.lactate);
+    if (l === null) return;
+    if (l > 2.5) red.push(`Lactate > 2.5 mmol/L (is ${l})`);
+    else if (l >= 2.0) amber.push(`Lactate 2.0–2.5 mmol/L (is ${l})`);
+}
+
+function computeCreatinineFlags(s, red, amber) {
+    const base = num(s.crBase), now = num(s.crNow), ago48 = num(s.cr48h);
+    let isRed = false;
+    if (base !== null && now !== null && base > 0 && (now / base) >= 1.5) {
+        red.push(`Creatinine ≥1.5× baseline (${now}/${base} = ${(now/base).toFixed(1)}x)`);
+        isRed = true;
+    }
+    if (ago48 !== null && now !== null && (now - ago48) >= 26) {
+        red.push(`Creatinine rise ≥26 μmol/L in 48h (Δ=${now - ago48})`);
+        isRed = true;
+    }
+    if (!isRed && now !== null && now > 120) {
+        amber.push(`Creatinine >120 μmol/L but stable (is ${now})`);
+    }
+}
+
+function computeUOPFlags(s, red) {
+    const ml = num(s.uopMl), hrs = num(s.uopHrs), kg = num(s.ptWt);
+    if (ml !== null && hrs !== null && hrs > 0 && kg !== null && kg > 0) {
+        const rate = ml / (kg * hrs);
+        $('uopRate').value = rate.toFixed(2);
+        if (rate < 0.5 && hrs >= 6) {
+            red.push(`UOP <0.5 mL/kg/h for ≥6h (${rate.toFixed(2)} mL/kg/h over ${hrs}h)`);
+        }
+    } else {
+        $('uopRate').value = '';
+    }
+}
+
+function computeInfectionFlags(s, red) {
+    const crp = num(s.crp), wcc = num(s.wcc), temp = num(s.temp);
+    if (s.crpRising) red.push('Infection concern: CRP rising');
+    if (crp !== null && crp > 100) red.push(`Infection concern: CRP >100 mg/L (is ${crp})`);
+    if (wcc !== null && s.clinicalInfect && (wcc > 12 || wcc < 4)) red.push(`Infection concern: WCC ${wcc} with clinical signs`);
+    if (temp !== null && temp >= 38) red.push(`Infection concern: Fever ≥38°C (is ${temp}°C)`);
+    if (s.abxSuspected) red.push('Infection concern: Ongoing antibiotics for suspected infection');
+}
+
+function applyOverride(s, red, amber) {
+    const note = s.overrideNote ? ` (${s.overrideNote})` : '';
+    if (s.override === 'red') red.push(`Nurse override: Red concern${note}`);
+    if (s.override === 'amber') amber.push(`Nurse override: Amber concern${note}`);
+}
+
+// --- UI UPDATE FUNCTIONS ---
+function updateRiskSummary(redFlags, amberFlags) {
     const redCount = redFlags.length;
-
     const amberCount = amberFlags.length;
-
     const totalCount = redCount + amberCount;
 
     $('redCount').textContent = redCount;
-
     $('amberCount').textContent = amberCount;
-
     $('totalCount').textContent = totalCount;
 
- 
-
-    const cat = determineCategory(redCount, amberCount);
+    const cat = (redCount > 0) ? {id: 'red', text: '🛑 High', follow: '72h + daily review'} :
+                (amberCount > 0) ? {id: 'amber', text: '🟠 Moderate', follow: '48h + reassess'} :
+                {id: 'green', text: '🟢 Low', follow: '24h only'};
 
     const catEl = $('catText');
-
-    catEl.textContent = (cat.cat==='red'?'🛑 High':cat.cat==='amber'?'🟠 Moderate':'🟢 Low');
-
-    catEl.className = 'status ' + cat.cat;
-
+    catEl.textContent = cat.text;
+    catEl.className = 'status ' + cat.id;
     $('followUp').textContent = cat.follow;
 
- 
-
-    // Flag list display
-
-    const list = $('flagList');
-
-    list.innerHTML = '';
-
     const makeTag = (txt, cls) => `<span class="tag ${cls}">${txt}</span>`;
-
-    const tagsHtml = [
-
-      ...redFlags.map(f => makeTag(f,'red')),
-
-      ...amberFlags.map(f => makeTag(f,'amber')),
-
-      ...(redCount===0 && amberCount===0 ? [makeTag('No red or amber flags','green')] : [])
-
-    ].join(' ');
-
-    list.innerHTML = tagsHtml;
-
- 
-
-    // Summary tags
-
-    $('summaryTags').innerHTML = [
-
-      makeTag(`Category: ${catEl.textContent}`, cat.cat),
-
-      makeTag(`Flags R/A: ${redCount}/${amberCount}`, totalCount>0?(redCount>0?'red':'amber'):'green'),
-
-      makeTag(`Follow-up: ${cat.follow}`, 'green')
-
-    ].join(' ');
-
- 
-
-    // Structured Review gating note (not blocking updates)
-
-    const srOK = $('srDone').checked;
-
-    const srNote = srOK ? '' : 'NOTE: Structured Review not marked complete. ';
-
- 
-
-    // Build narrative summary
-
-    const lines = [];
-
-    const idLine = [
-
-      $('ptName').value ? `Patient: ${$('ptName').value}` : 'Patient: (Unnamed)',
-
-      $('ptMrn').value ? `MRN: ${$('ptMrn').value}` : null,
-
-      $('ptLoc').value ? `Location: ${$('ptLoc').value}` : null
-
-    ].filter(Boolean).join(' | ');
-
-    lines.push(idLine);
-
-    lines.push(`Risk: ${catEl.textContent} | Flags R/A ${redCount}/${amberCount} (Total ${totalCount}) | Follow-up: ${cat.follow}`);
-
- 
-
-    // Oxy snapshot
-
-    const om = $('oxMod').value;
-
-    let oxy = `Oxygen: ${om}`;
-
-    if(om==='NP' && $('npFlow').value) oxy += ` ${$('npFlow').value} L/min`;
-
-    if(om==='HFNP'){
-
-      if($('hfnpFio2').value) oxy += ` FiO₂ ${$('hfnpFio2').value}%`;
-
-      if($('hfnpFlow').value) oxy += ` @ ${$('hfnpFlow').value} L/min`;
-
+    const flagList = $('flagList');
+    if (totalCount > 0) {
+        flagList.innerHTML = [...redFlags.map(f => makeTag(f, 'red')), ...amberFlags.map(f => makeTag(f, 'amber'))].join('');
+    } else {
+        flagList.innerHTML = makeTag('No red or amber flags', 'green');
     }
+}
 
-    if($('pressors24h').checked) oxy += ` | Pressors last 24h`;
+function updateGeneratedSummary(s, redFlags, amberFlags) {
+    const redCount = redFlags.length;
+    const amberCount = amberFlags.length;
+    const catEl = $('catText');
+    const cat = { id: catEl.className.replace('status ', ''), text: catEl.textContent, follow: $('followUp').textContent };
 
+    // Summary Tags
+    const makeTag = (txt, cls) => `<span class="tag ${cls}">${txt}</span>`;
+    $('summaryTags').innerHTML = [
+        makeTag(`Category: ${cat.text}`, cat.id),
+        makeTag(`Flags R/A: ${redCount}/${amberCount}`, (redCount > 0) ? 'red' : (amberCount > 0) ? 'amber' : 'green'),
+        makeTag(`Follow-up: ${cat.follow}`, 'green')
+    ].join('');
+
+    // Narrative Summary
+    const lines = [];
+    const idLine = [
+        s.ptName ? `Patient: ${s.ptName}` : 'Patient: (Unnamed)',
+        s.ptMrn ? `MRN: ${s.ptMrn}` : null,
+        s.ptLoc ? `Location: ${s.ptLoc}` : null
+    ].filter(Boolean).join(' | ');
+    lines.push(idLine);
+    lines.push(`Risk: ${cat.text} | Flags R/A ${redCount}/${amberCount} (Total ${redCount+amberCount}) | Follow-up: ${cat.follow}`);
+
+    let oxy = `Oxygen: ${s.oxMod}`;
+    if (s.oxMod === 'NP' && s.npFlow) oxy += ` ${s.npFlow} L/min`;
+    if (s.oxMod === 'HFNP') {
+        if (s.hfnpFio2) oxy += ` FiO₂ ${s.hfnpFio2}%`;
+        if (s.hfnpFlow) oxy += ` @ ${s.hfnpFlow} L/min`;
+    }
+    if (s.pressors24h) oxy += ' | Pressors last 24h';
     lines.push(oxy);
 
- 
+    const numBits = [
+        s.adds ? `ADDS ${s.adds}` : null,
+        s.gcs ? `GCS ${s.gcs}` : null,
+        s.lactate ? `Lactate ${s.lactate} mmol/L` : null,
+        s.crNow ? `Cr ${s.crNow} μmol/L${s.crBase ? ` (base ${s.crBase})` : ''}` : null,
+        s.uopMl ? `UOP ${$('uopRate').value} mL/kg/h over ${s.uopHrs}h` : null
+    ].filter(Boolean);
+    if (numBits.length) lines.push(numBits.join(' | '));
 
-    // Key numbers
+    const infBits = [
+        s.crp ? `CRP ${s.crp}`: null,
+        s.crpRising ? 'CRP rising' : null,
+        s.wcc ? `WCC ${s.wcc}` : null,
+        s.temp ? `Temp ${s.temp}°C` : null,
+        s.abxSuspected ? 'On abx (suspected infection)' : null,
+        s.clinicalInfect ? 'Clinical signs present' : null
+    ].filter(Boolean);
+    if (infBits.length) lines.push('Infection: ' + infBits.join(' | '));
 
-    const numBits = [];
+    if (redFlags.length > 0) lines.push('Red flags: ' + redFlags.join('; '));
+    if (amberFlags.length > 0) lines.push('Amber flags: ' + amberFlags.join('; '));
+    if (redFlags.length === 0 && amberFlags.length === 0) lines.push('No red or amber flags present. Criteria for Green met.');
 
-    const adds = $('adds').value; if(adds) numBits.push(`ADDS ${adds}`);
+    const sr = [
+        s.elec ? `Electrolytes: ${s.elec}` : null,
+        s.labsOther ? `WCC/CRP/Alb/Hb: ${s.labsOther}` : null,
+        s.nutrition ? `Nutrition: ${s.nutrition}` : null,
+        s.lines ? `Lines & drains: ${s.lines}` : null,
+        s.bowel ? `Bowel: ${s.bowel}` : null,
+        s.msk ? `Position/MSK: ${s.msk}` : null,
+        s.psych ? `Psychosocial/discharge: ${s.psych}` : null,
+        s.trach ? `Tracheostomy: ${s.trach}` : null
+    ].filter(Boolean);
+    lines.push((s.srDone ? 'Structured Review:' : 'Structured Review (INCOMPLETE):') + ' ' + (sr.length ? sr.join(' | ') : 'not documented'));
+    if (!s.srDone) lines.push('→ Please complete the Structured Review checklist.');
 
-    const gcs = $('gcs').value; if(gcs) numBits.push(`GCS ${gcs}`);
+    $('summary').value = lines.join('\n');
+}
 
-    const lac = $('lactate').value; if(lac) numBits.push(`Lactate ${lac} mmol/L`);
 
-    const crb = $('crBase').value; const crn = $('crNow').value;
-
-    if(crn) numBits.push(`Cr ${crn} μmol/L` + (crb?` (base ${crb})`:''));
-
-    const rate = $('uopRate').value; const hrs = $('uopHrs').value;
-
-    if(rate && hrs) numBits.push(`UOP ${rate} mL/kg/h over ${hrs}h`);
-
-    if(numBits.length) lines.push(numBits.join(' | '));
-
- 
-
-    // Infection snapshot
-
-    const infBits = [];
-
-    const crp = $('crp').value; if(crp) infBits.push(`CRP ${crp}`);
-
-    if($('crpRising').checked) infBits.push('CRP rising');
-
-    const wcc = $('wcc').value; if(wcc) infBits.push(`WCC ${wcc}`);
-
-    const t = $('temp').value; if(t) infBits.push(`Temp ${t}°C`);
-
-    if($('abxSuspected').checked) infBits.push('On abx (suspected infection)');
-
-    if($('clinicalInfect').checked) infBits.push('Clinical signs present');
-
-    if(infBits.length) lines.push('Infection: ' + infBits.join(' | '));
-
- 
-
-    // Flag details
-
-    if(redFlags.length || amberFlags.length){
-
-      if(redFlags.length) lines.push('Red flags: ' + redFlags.join('; '));
-
-      if(amberFlags.length) lines.push('Amber flags: ' + amberFlags.join('; '));
-
-    } else {
-
-      lines.push('No red or amber flags present. Criteria for Green met (ADDS 0–2; stable).');
-
+// --- BUTTON ACTIONS ---
+async function copySummary() {
+    try {
+        await navigator.clipboard.writeText($('summary').value);
+        alert('Summary copied to clipboard.');
+    } catch (e) {
+        alert('Copy failed. You can select and copy manually.');
     }
+}
 
- 
-
-    // Structured Review
-
-    const sr = [];
-
-    const pushIf = (label, id) => { const v = $(id).value; if(v) sr.push(`${label}: ${v}`); };
-
-    pushIf('Electrolytes', 'elec');
-
-    pushIf('WCC/CRP/Alb/Hb', 'labsOther');
-
-    pushIf('Nutrition', 'nutrition');
-
-    pushIf('Lines & drains', 'lines');
-
-    pushIf('Bowel', 'bowel');
-
-    pushIf('Position/MSK', 'msk');
-
-    pushIf('Psychosocial/discharge', 'psych');
-
-    pushIf('Tracheostomy', 'trach');
-
-    lines.push((srOK?'Structured Review:':'Structured Review (INCOMPLETE):') + ' ' + (sr.length?sr.join(' | '):'not documented'));
-
-    if(!srOK) lines.push('→ Please complete the Structured Review checklist.');
-
- 
-
-    $('summary')..value = srNote + lines.join('\n');
-
-  }
-
- 
-
-  // Initial compute
-
-  computeAll();
-
- 
-
-  // Copy summary
-
-  $('copyBtn').addEventListener('click', async ()=>{
-
-    try{
-
-      await navigator.clipboard.writeText($('summary').value);
-
-      alert('Summary copied to clipboard.');
-
-    } catch(e){ alert('Copy failed. You can select and copy manually.'); }
-
-  });
-
- 
-
-  // Print
-
-  $('printBtn').addEventListener('click', ()=>window.print());
-
- 
-
-  // New
-
-  $('newBtn').addEventListener('click', ()=>{
-
-    if(!confirm('Clear all fields?')) return;
-
-    inputs.forEach(id=>{
-
-      const el = $(id); if(!el) return;
-
-      if(el.type==='checkbox') el.checked = false;
-
-      else el.value = '';
-
+function clearForm() {
+    if (!confirm('Are you sure you want to clear all fields?')) return;
+    inputs.forEach(id => {
+        const el = $(id);
+        if (!el) return;
+        if (el.type === 'checkbox') el.checked = false;
+        else el.value = '';
     });
-
     $('oxMod').value = 'RA';
-
     toggleOxyFields();
-
     computeAll();
+}
 
-  });
+function getKey() {
+    const mrn = ($('ptMrn').value || '').trim();
+    const name = ($('ptName').value || '').trim().replace(/\s+/g, '_');
+    if (mrn && name) return `patient-${mrn}-${name}`;
+    if (mrn) return `patient-${mrn}`;
+    if (name) return `patient-${name}`;
+    return null;
+}
 
- 
+function saveState() {
+    const key = getKey();
+    if (!key) {
+        alert('Please enter at least a Patient Name or MRN to save.');
+        return;
+    }
+    const data = { id: key, savedAt: new Date().toISOString(), state: captureState() };
+    const all = JSON.parse(localStorage.getItem('ICU_RISK_TOOL_SAVES') || '{}');
+    all[key] = data;
+    localStorage.setItem('ICU_RISK_TOOL_SAVES', JSON.stringify(all));
+    alert(`Patient data saved as: ${key}`);
+}
 
-  // Save/Load using localStorage
-
-  function keyId(){
-
-    const mrn = $('ptMrn').value?.trim();
-
-    const name = $('ptName').value?.trim();
-
-    return mrn || name || ('patient-' + Date.now());
-
-  }
-
- 
-
-  $('saveBtn').addEventListener('click', ()=>{
-
-    const id = keyId();
-
-    const data = { id, savedAt: new Date().toISOString(), state: captureState() };
-
-    const all = JSON.parse(localStorage.getItem('ICU_RISK_TOOL') || '{}');
-
-    all[id] = data;
-
-    localStorage.setItem('ICU_RISK_TOOL', JSON.stringify(all));
-
-    alert(`Saved as: ${id}`);
-
-  });
-
- 
-
-  $('loadBtn').addEventListener('click', ()=>{
-
-    const all = JSON.parse(localStorage.getItem('ICU_RISK_TOOL') || '{}');
-
+function loadState() {
+    const all = JSON.parse(localStorage.getItem('ICU_RISK_TOOL_SAVES') || '{}');
     const keys = Object.keys(all);
-
-    if(keys.length===0){ alert('No saved patients.'); return; }
-
-    const pick = prompt('Enter ID to load:\n' + keys.join('\n'));
-
-    if(!pick || !all[pick]) return;
-
-    const state = all[pick].state;
-
-    inputs.forEach(id=>{
-
-      if(!(id in state)) return;
-
-      const el = $(id);
-
-      if(!el) return;
-
-      if(el.type==='checkbox') el.checked = !!state[id];
-
-      else el.value = state[id];
-
+    if (keys.length === 0) {
+        alert('No saved patient data found.');
+        return;
+    }
+    const sortedKeys = keys.sort((a, b) => {
+        const dateA = new Date(all[a].savedAt);
+        const dateB = new Date(all[b].savedAt);
+        return dateB - dateA; // Sort descending (newest first)
     });
+    const choice = prompt('Select patient to load:\n\n' + sortedKeys.map((k, i) => `${i + 1}. ${k} (saved ${new Date(all[k].savedAt).toLocaleDateString()})`).join('\n'));
+    if (choice === null) return;
 
-    toggleOxyFields();
+    const index = parseInt(choice, 10) - 1;
+    if (!isNaN(index) && index >= 0 && index < sortedKeys.length) {
+        const keyToLoad = sortedKeys[index];
+        applyState(all[keyToLoad].state);
+    } else {
+        alert('Invalid selection.');
+    }
+}
 
-    computeAll();
-
-  });
-
- 
-
-  // Export JSON
-
-  $('exportBtn').addEventListener('click', ()=>{
-
+function exportState() {
+    const key = getKey() || 'export';
     const data = { exportedAt: new Date().toISOString(), state: captureState() };
-
-    const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
-
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
-
     a.href = URL.createObjectURL(blob);
-
-    const id = keyId().toString().replace(/\s+/g,'_');
-
-    a.download = `icu_risk_${id}.json`;
-
+    a.download = `icu_risk_${key}_${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
     a.click();
-
+    document.body.removeChild(a);
     URL.revokeObjectURL(a.href);
+}
 
-  });
-
+// --- START THE APP ---
+document.addEventListener('DOMContentLoaded', initialize);
 </script>
-
 </body>
-
 </html>
