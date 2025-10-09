@@ -8,10 +8,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-      /* --- [MODIFIED] Light Theme --- */
       :root{
-        --bg:#f4f7fa; --card:#ffffff; --ink:#111827; --muted:#6b7280; --accent:#007aff;
-        --red:#ef4444; --amber:#f59e0b; --green:#10b981; --line:#e5e7eb; --input-bg:#f4f7fa;
+        --bg:#f0f9f9; --card:#ffffff; --ink:#111827; --muted:#4b5563; --accent:#007a7a;
+        --red:#ef4444; --amber:#f59e0b; --green:#10b981; --line:#d1e3e3; --input-bg:#f0f9f9;
       }
       body{font-family:'Inter', system-ui, sans-serif; background:var(--bg); color:var(--ink); margin:0 0 80px 0; line-height:1.4;}
       header{padding:16px 20px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:12px; flex-wrap:wrap; background: var(--card);}
@@ -19,21 +18,19 @@
       .container{max-width:800px; margin:0 auto; padding:16px}
       .grid{display:grid; grid-template-columns:repeat(12,1fr); gap:16px}
       .card{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px; margin-bottom:16px; box-shadow: 0 1px 3px rgba(0,0,0,0.02), 0 1px 2px rgba(0,0,0,0.04);}
-      .col-3{grid-column:span 3}.col-4{grid-column:span 4}.col-6{grid-column:span 6}.col-12{grid-column:span 12}
+      .col-2{grid-column:span 2}.col-3{grid-column:span 3}.col-4{grid-column:span 4}.col-6{grid-column:span 6}.col-12{grid-column:span 12}
       label{display:block; font-size:.9rem; color:var(--muted); margin-bottom:6px; font-weight:500;}
       input[type="text"], input[type="number"], select, textarea{
         width:100%; padding:12px; border-radius:10px; border:1px solid var(--line); box-sizing:border-box;
-        background:var(--input-bg); color:var(--ink); outline:none; font-size:1rem;
+        background:var(--input-bg); color:var(--ink); outline:none; font-size:1rem; transition: border-color 0.2s;
       }
-      input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2); }
-      /* --- [MODIFIED] Larger summary box --- */
+      input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0, 122, 122, 0.2); }
       textarea{min-height:150px; resize:vertical}
-      .pill{display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; font-size:.85rem; border:1px solid var(--line); background:var(--bg);}
-      .tag{display:inline-flex; align-items:center; padding: 4px 10px; border-radius:999px; font-size:.85rem; margin:2px; border:1px solid; font-weight:500;}
-      .tag.red{background:rgba(239,68,68,.1); color:var(--red); border-color:rgba(239,68,68,.3)}
-      .tag.amber{background:rgba(245,158,11,.15); color:var(--amber); border-color:rgba(245,158,11,.35)}
-      .tag.green{background:rgba(16,185,129,.12); color:var(--green); border-color:rgba(16,185,129,.3)}
-      .btn.primary{background:var(--accent); color:#fff; border:none; padding:10px 14px; border-radius:10px; cursor:pointer; font-weight: 500;}
+      .btn, .override-btn { background-color: var(--bg); color: var(--muted); border: 1px solid var(--line); padding: 8px 12px; border-radius: 8px; cursor:pointer; font-weight: 500; transition: all 0.2s; }
+      .btn.primary{background:var(--accent); color:#fff; border-color:var(--accent);}
+      .override-btn:hover { background-color: var(--line); }
+      .override-btn.amber.active { background-color: var(--amber); color:white; border-color:var(--amber);}
+      .override-btn.red.active { background-color: var(--red); color:white; border-color:var(--red); }
       .kpi{display:grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap:12px;}
       .kpi .box{background:var(--bg); border:1px solid var(--line); padding:12px; border-radius:12px; text-align:center}
       .kpi .box h3{margin:0; font-size:1.3rem}
@@ -41,21 +38,32 @@
       .status{font-weight:700}
       .status.red{color:var(--red)} .status.amber{color:var(--amber)} .status.green{color:var(--green)}
       .section-title{margin-bottom:12px; font-size:1.1rem; font-weight:600;}
-      .check-group { display: flex; flex-direction: column; gap: 10px; }
-      .check-label {
+      .input-group { margin-bottom: 24px; }
+      .check-label-full {
         display: flex; align-items: center; background-color: var(--bg); padding: 12px; border-radius: 10px;
         border: 1px solid var(--line); cursor: pointer; transition: all 0.2s;
       }
-      .check-label:hover { border-color: var(--accent); }
-      .check-label input { opacity: 0; width: 0; height: 0; }
-      .check-label .checkmark {
+      .check-label-full:hover { border-color: var(--accent); }
+      .check-label-full input { opacity: 0; width: 0; height: 0; }
+      .check-label-full .checkmark {
         width: 20px; height: 20px; border: 2px solid #9ca3af; border-radius: 5px; margin-right: 12px;
         display: flex; align-items: center; justify-content: center; transition: all 0.2s;
       }
-      .check-label .checkmark:after { content: '✓'; font-size: 14px; color: white; opacity: 0; transform: scale(0.5); transition: all 0.2s;}
-      .check-label input:checked ~ .checkmark { background-color: var(--accent); border-color: var(--accent); }
-      .check-label input:checked ~ .checkmark:after { opacity: 1; transform: scale(1); }
-      .input-group { margin-bottom: 24px; }
+      .check-label-full .checkmark:after { content: '✓'; font-size: 14px; color: white; opacity: 0; transform: scale(0.5); transition: all 0.2s;}
+      .check-label-full input:checked ~ .checkmark { background-color: var(--accent); border-color: var(--accent); }
+      .check-label-full input:checked ~ .checkmark:after { opacity: 1; transform: scale(1); }
+      
+      .device-list { display: flex; flex-direction: column; gap: 12px; }
+      .device-item { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+      .device-item label {margin-bottom:0;}
+      .device-item input[type="checkbox"] { width:20px; height:20px;}
+      .device-item input[type="text"] { flex:1; min-width:150px; padding: 6px 10px; font-size:0.9rem; }
+      
+      .bloods-grid {display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:16px;}
+      .blood-item {display:flex; align-items:center; gap: 5px;}
+      .blood-item select { font-size:0.9rem; padding: 12px 6px; width:50px; }
+      .blood-abnormal { border-color: var(--red) !important; background-color: rgba(239,68,68,.05) !important; }
+
       footer {
         position: fixed; bottom: 0; left: 0; width: 100%; background: var(--card);
         border-top: 1px solid var(--line); padding: 12px 20px;
@@ -64,8 +72,27 @@
       .footer-item { color: var(--muted); font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
       .footer-item strong { color: var(--ink); font-weight: 500; }
       .footer-score { padding: 8px 16px; border-radius: 8px; font-weight: 700; text-align: center;}
+      .tag{display:inline-flex; align-items:center; padding: 4px 10px; border-radius:999px; font-size:.85rem; margin:2px; border:1px solid; font-weight:500;}
+      .tag.red{background:rgba(239,68,68,.1); color:var(--red); border-color:rgba(239,68,68,.3)}
+      .tag.amber{background:rgba(245,158,11,.15); color:var(--amber); border-color:rgba(245,158,11,.35)}
+      .tag.green{background:rgba(16,185,129,.12); color:var(--green); border-color:rgba(16,185,129,.3)}
+      hr { border: none; height: 1px; background-color: var(--line); margin: 24px 0; }
+      
+      .accordion-wrapper { border: 1px solid var(--line); border-radius: 12px; overflow:hidden;}
+      .accordion {
+        background-color: #f8fdfd; color: var(--ink); cursor: pointer; padding: 18px; width: 100%; border: none;
+        border-bottom: 1px solid var(--line); text-align: left; outline: none; font-size: 1.1rem; font-weight:600;
+        transition: background-color 0.2s;
+      }
+      .accordion:last-of-type { border-bottom: none; }
+      .accordion:hover { background-color: #e6f2f2; }
+      .accordion:after { content: '▼'; font-size: 0.8rem; color: var(--muted); float: right; }
+      .accordion.active:after { content: "▲"; }
+      .panel { padding: 0 18px; background-color: white; display: none; overflow: hidden; }
+      .optional-note { text-align:center; color: var(--muted); font-size: 0.9rem; margin-bottom: 12px; }
+      
       @media (max-width:700px){
-          .col-3,.col-4,.col-6{grid-column:span 12}
+          .col-2,.col-3,.col-4,.col-6{grid-column:span 12}
           footer { flex-wrap: wrap; justify-content: center; text-align: center; padding: 8px; }
           .footer-item { width: 45%; }
           .footer-score { width: 100%; margin-top: 8px; }
@@ -75,17 +102,15 @@
 <body>
 <header>
     <h1>ICU Readmission Risk Tool</h1>
-    <span class="pill">🕒 <span id="now"></span></span>
 </header>
 <div class="container">
     <div class="card">
         <div class="grid">
             <div class="col-6"><label for="ptName">Patient Name</label><input id="ptName" type="text"/></div>
             <div class="col-6"><label for="ptMrn">MRN / URN</label><input id="ptMrn" type="text"/></div>
-            <div class="col-3"><label for="ptAge">Age</label><input id="ptAge" type="number" min="0"/></div>
-            <div class="col-3"><label for="ptWt">Weight (kg)</label><input id="ptWt" type="number" step="0.1" min="0"/></div>
-            <div class="col-3"><label for="icuLos">ICU LOS (days)</label><input id="icuLos" type="number" min="0"/></div>
-            <div class="col-3"><label for="ptLoc">Location/Bed</label><input id="ptLoc" type="text"/></div>
+            <div class="col-4"><label for="ptAge">Age</label><input id="ptAge" type="number" min="0"/></div>
+            <div class="col-4"><label for="icuLos">ICU LOS (days)</label><input id="icuLos" type="number" min="0"/></div>
+            <div class="col-4"><label for="ptLoc">Location/Bed</label><input id="ptLoc" type="text"/></div>
             <div class="col-12"><label for="ptAdmissionReason">Primary Reason for ICU Admission</label><input id="ptAdmissionReason" type="text"/></div>
         </div>
     </div>
@@ -94,58 +119,129 @@
             <div class="box"><small>Category</small><h3 id="catText" class="status green">🟢 LOW</h3></div>
             <div class="box"><small>CAT 1 Flags</small><h3 id="redCount">0</h3></div>
             <div class="box"><small>CAT 2 Flags</small><h3 id="amberCount">0</h3></div>
-            <div class="box"><small>Follow-Up</small><h3 id="followUp">24h</h3></div>
         </div>
+        <hr>
+        <div class="section-title">Identified Risk Factors</div>
+        <div id="flagList" style="margin-top:12px; min-height:24px;">
+             </div>
     </div>
     <div class="card">
-        <div class="input-group">
+         <div class="input-group">
             <div class="grid">
-                <div class="col-4"><label for="adds">ADDS</label><input id="adds" type="number" min="0" max="10" /></div>
-                <div class="col-4"><label for="gcs">GCS</label><input id="gcs" type="number" min="3" max="15" /></div>
-                <div class="col-4"><label for="lactate">Lactate</label><input id="lactate" type="number" step="0.1" min="0"/></div>
+                <div class="col-6"><label for="adds">ADDS</label><input id="adds" type="number" min="0" max="10" /></div>
+                <div class="col-6"><label for="lactate">Lactate</label><input id="lactate" type="number" step="0.1" min="0"/></div>
             </div>
         </div>
         <div class="input-group">
              <div class="grid">
-                <div class="col-4"><label for="oxMod">Oxygen Modality</label><select id="oxMod"><option value="RA">Room Air</option><option value="NP">Nasal Prongs</option><option value="HFNP">HFNP</option><option value="Other">Other</option></select></div>
-                <div class="col-4 npOnly" style="display:none"><label for="npFlow">NP Flow (L/min)</label><input id="npFlow" type="number" step="0.5" min="0" /></div>
-                <div class="col-4 hfnpOnly" style="display:none"><label for="hfnpFio2">HFNP FiO₂ (%)</label><input id="hfnpFio2" type="number" step="1" min="21" max="100" /></div>
-                <div class="col-4 hfnpOnly" style="display:none"><label for="hfnpFlow">HFNP Flow (L/min)</label><input id="hfnpFlow" type="number" step="1" min="0" /></div>
+                <div class="col-6"><label for="oxMod">Oxygen Modality</label><select id="oxMod"><option value="RA">Room Air</option><option value="NP">Nasal Prongs</option><option value="HFNP">HFNP</option><option value="NIV">NIV</option></select></div>
+                <div class="col-6 npOnly" style="display:none"><label for="npFlow">NP Flow (L/min)</label><input id="npFlow" type="number" step="0.5" min="0" /></div>
+                <div class="col-3 hfnpOnly" style="display:none"><label for="hfnpFio2">HFNP FiO₂ (%)</label><input id="hfnpFio2" type="number" step="1" min="21" max="100" /></div>
+                <div class="col-3 hfnpOnly" style="display:none"><label for="hfnpFlow">HFNP Flow (L/min)</label><input id="hfnpFlow" type="number" step="1" min="0" /></div>
+                <div class="col-6 nivOnly" style="display:none"><label for="nivDetails">NIV Details</label><input id="nivDetails" type="text" placeholder="e.g., IPAP/EPAP"/></div>
             </div>
         </div>
         <div class="input-group">
-            <div class="check-group">
-                <label class="check-label"><input id="confused" type="checkbox" /><span class="checkmark"></span>Confused / Muddled</label>
-                <label class="check-label"><input id="pressors24h" type="checkbox" /><span class="checkmark"></span>Vasopressors in last 24h</label>
-                <label class="check-label"><input id="np3Last12h" type="checkbox" /><span class="checkmark"></span>NP ≥3 L/min at any time in last 12h</label>
-                <label class="check-label"><input id="rapidWean" type="checkbox" /><span class="checkmark"></span>Rapid wean HFNP → NP in last 12h</label>
-                <label class="check-label"><input id="akiConcern" type="checkbox" /><span class="checkmark"></span>AKI / Concerning Creatinine Rise</label>
-                <label class="check-label"><input id="uopLow" type="checkbox" /><span class="checkmark"></span>UOP concerning / trending &lt;0.5 mL/kg/hr</label>
-                <label class="check-label"><input id="infectionConcern" type="checkbox" /><span class="checkmark"></span>Clinical infection concern</label>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <label class="check-label-full"><input id="after_hours_discharge" type="checkbox" /><span class="checkmark"></span>Discharged after-hours (score only for first night on ward)</label>
+                <label class="check-label-full"><input id="confused" type="checkbox" /><span class="checkmark"></span>Confused</label>
+                <label class="check-label-full"><input id="pressors24h" type="checkbox" /><span class="checkmark"></span>Vasopressors in last 24h</label>
+                <label class="check-label-full"><input id="np3Last12h" type="checkbox" /><span class="checkmark"></span>Significant FiO₂ use (NP ≥3L, HFNP >30% or NIV in last 12h, or intubated in last 24h)</label>
+                <label class="check-label-full"><input id="rapidWean" type="checkbox" /><span class="checkmark"></span>Rapid oxygen wean in last 12h (e.g. HFNP → NP)</label>
+                <label class="check-label-full"><input id="akiConcern" type="checkbox" /><span class="checkmark"></span>AKI / concerning Creatinine rise</label>
+                <label class="check-label-full"><input id="uopLow" type="checkbox" /><span class="checkmark"></span>UOP concerning / downtrending (&lt;0.5 mL/kg/hr)</label>
+                <label class="check-label-full"><input id="infectionConcern" type="checkbox" /><span class="checkmark"></span>Concern for infection</label>
             </div>
         </div>
         <div class="input-group">
             <div class="section-title">Clinical Judgement Override</div>
-            <div class="grid">
-                <div class="col-6"><label>Escalate risk?</label><select id="override"><option value="none">No</option><option value="amber">Yes - Amber (CAT 2)</option><option value="red">Yes - Red (CAT 1)</option></select></div>
-                <div class="col-6"><label>Reason for override</label><input id="overrideNote" type="text"/></div>
+            <p style="font-size:0.9rem; color: var(--muted); margin-top:-8px; margin-bottom:12px;">Click below to upgrade risk based on clinical concern.</p>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
+                <button class="override-btn amber" id="override_amber">Upgrade to Amber (CAT 2)</button>
+                <button class="override-btn red" id="override_red">Upgrade to Red (CAT 1)</button>
+                <button class="override-btn" id="override_clear">Clear Override</button>
+            </div>
+            <input type="hidden" id="override" value="none">
+            <div id="override_reason_box" style="display:none;"><label>Reason for override</label><input id="overrideNote" type="text"/></div>
+        </div>
+    </div>
+    
+    <div class="optional-note">The following sections are optional DMR note helpers</div>
+    <div class="accordion-wrapper">
+        <button class="accordion">A-E Assessment</button>
+        <div class="panel">
+            <div style="padding-top:18px;">
+                <div class="grid">
+                    <div class="col-12">
+                        <label class="check-label-full" style="padding: 8px 12px;"><input id="use_mods" type="checkbox" /><span class="checkmark"></span>MODS in place</label>
+                    </div>
+                    <div class="col-12" id="mods_inputs" style="display:none;">
+                        <div class="grid">
+                            <div class="col-12"><label>MODS Score</label><input id="mods_score" type="text"/></div>
+                            <div class="col-12"><label>MODS Details</label><input id="mods_details" type="text"/></div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="grid">
+                    <div class="col-12"><label>A</label><input id="airway_a" type="text" placeholder="Patent?"/></div>
+                    <div class="col-3"><label>B</label><input id="b_rr" type="number" placeholder="RR"/></div>
+                    <div class="col-3"><label>&nbsp;</label><input id="b_spo2" type="number" placeholder="SpO₂ (%)"/></div>
+                    <div class="col-3"><label>&nbsp;</label><input id="b_device" type="text" placeholder="Device"/></div>
+                    <div class="col-3"><label>&nbsp;</label><input id="b_wob" type="text" placeholder="WOB"/></div>
+                    <div class="col-3"><label>C</label><input id="c_hr" type="number" placeholder="HR"/></div>
+                    <div class="col-3"><label>&nbsp;</label><input id="c_nibp" type="text" placeholder="NIBP"/></div>
+                    <div class="col-3"><label>&nbsp;</label><input id="c_cr" type="text" placeholder="Cap Refill"/></div>
+                    <div class="col-3"><label>&nbsp;</label><input id="c_perf" type="text" placeholder="Perfusion"/></div>
+                    <div class="col-4"><label>D</label><input id="d_alert" type="text" placeholder="Alert?"/></div>
+                    <div class="col-4"><label>&nbsp;</label><input id="d_gcs" type="number" min="3" max="15" placeholder="GCS"/></div>
+                    <div class="col-4"><label>&nbsp;</label><input id="d_pain" type="text" placeholder="Pain"/></div>
+                    <div class="col-4"><label>E</label><input id="e_temp" type="number" step="0.1" placeholder="Temp"/></div>
+                    <div class="col-4"><label>&nbsp;</label><input id="e_bsl" type="number" step="0.1" placeholder="BSL"/></div>
+                    <div class="col-4"><label>&nbsp;</label><input id="e_uop" type="text" placeholder="UOP"/></div>
+                </div>
+            </div>
+        </div>
+
+        <button class="accordion">Systems Review</button>
+        <div class="panel">
+            <div style="padding-top:18px;">
+                <div class="section-title">Bloods</div>
+                <div class="bloods-grid">
+                    <div class="blood-item"><label for="bl_lac_review">Lac</label><input id="bl_lac_review" type="number" step="0.1"/><select id="bl_lac_review_trend"><option>-</option><option>↑</option><option>↓</option><option>→</option></select></div>
+                    <div class="blood-item"><label for="bl_wcc">WCC</label><input id="bl_wcc" type="number" step="0.1"/><select id="bl_wcc_trend"><option>-</option><option>↑</option><option>↓</option><option>→</option></select></div>
+                    <div class="blood-item"><label for="bl_cr_review">Cr</label><input id="bl_cr_review" type="number"/><select id="bl_cr_review_trend"><option>-</option><option>↑</option><option>↓</option><option>→</option></select></div>
+                    <div class="blood-item"><label for="bl_k">K</label><input id="bl_k" type="number" step="0.1"/><select id="bl_k_trend"><option>-</option><option>↑</option><option>↓</option><option>→</option></select></div>
+                    <div class="blood-item"><label for="bl_mg">Mg</label><input id="bl_mg" type="number" step="0.1"/><select id="bl_mg_trend"><option>-</option><option>↑</option><option>↓</option><option>→</option></select></div>
+                    <div class="blood-item"><label for="bl_hb">Hb</label><input id="bl_hb" type="number"/><select id="bl_hb_trend"><option>-</option><option>↑</option><option>↓</option><option>→</option></select></div>
+                    <div class="blood-item"><label for="bl_plts">Plts</label><input id="bl_plts" type="number"/><select id="bl_plts_trend"><option>-</option><option>↑</option><option>↓</option><option>→</option></select></div>
+                    <div class="blood-item"><label for="bl_alb">Alb</label><input id="bl_alb" type="number"/><select id="bl_alb_trend"><option>-</option><option>↑</option><option>↓</option><option>→</option></select></div>
+                </div>
+                <div class="grid" style="margin-top:16px;">
+                    <div class="col-12"><label>Electrolyte Plan</label><input id="elec_replace_note" type="text" placeholder="e.g., K-Rep ordered, Mg checked"/></div>
+                    <div class="col-12">
+                        <label class="check-label-full" style="padding: 8px 12px;"><input id="new_bloods_ordered" type="checkbox" /><span class="checkmark"></span>New blood request ordered for next phleb round</label>
+                    </div>
+                </div>
+                <hr>
+                <div class="section-title">Devices</div>
+                <div class="device-list">
+                    <div class="device-item"><input type="checkbox" id="dev_idc"><label for="dev_idc">IDC</label></div>
+                    <div class="device-item"><input type="checkbox" id="dev_pivc_1"><label for="dev_pivc_1">PIVC</label><input type="text" id="dev_pivc_loc_1" placeholder="Location/PIVAS #1"/></div>
+                    <div class="device-item"><input type="checkbox" id="dev_pivc_2"><label for="dev_pivc_2">PIVC</label><input type="text" id="dev_pivc_loc_2" placeholder="Location/PIVAS #2"/></div>
+                    <div class="device-item"><input type="checkbox" id="dev_cvad"><label for="dev_cvad">CVAD</label><input type="text" id="dev_cvad_type" placeholder="Type/Location"/></div>
+                    <div class="device-item"><input type="checkbox" id="dev_tube"><label for="dev_tube">Enteral Tube</label><input type="text" id="dev_tube_type" placeholder="Specify NG/NJ/PEG"/></div>
+                    <div class="device-item"><input type="checkbox" id="dev_drain_1"><label for="dev_drain_1">Drain</label><input type="text" id="dev_drain_loc_1" placeholder="Location #1"/></div>
+                    <div class="device-item"><input type="checkbox" id="dev_drain_2"><label for="dev_drain_2">Drain</label><input type="text" id="dev_drain_loc_2" placeholder="Location #2"/></div>
+                    <div class="device-item"><input type="checkbox" id="dev_pacing"><label for="dev_pacing">Pacing Wires</label></div>
+                    <div class="device-item"><input type="checkbox" id="dev_other"><label for="dev_other">Other</label><input type="text" id="dev_other_note" placeholder="Note"/></div>
+                </div>
             </div>
         </div>
     </div>
-    <div class="card">
-        <div class="section-title">Structured Review (Optional)</div>
-        <div class="grid">
-            <div class="col-6"><label>Electrolytes / Labs</label><input id="elec" type="text" /></div>
-            <div class="col-6"><label>Nutrition</label><input id="nutrition" type="text" /></div>
-            <div class="col-6"><label>Lines & Drains</label><input id="lines" type="text" /></div>
-            <div class="col-6"><label>Bowel Function</label><input id="bowel" type="text" /></div>
-            <div class="col-6"><label>Mobility / MSK</label><input id="msk" type="text" /></div>
-            <div class="col-6"><label>Psychosocial</label><input id="psych" type="text" /></div>
-        </div>
-    </div>
+    
     <div class="card">
         <div class="section-title">Auto‑Generated Summary</div>
-        <div id="flagList" style="margin-bottom:12px;"></div>
         <textarea id="summary" placeholder="Summary will auto-generate here..." readonly></textarea>
         <div style="margin-top:12px;"><button class="btn primary" id="copyBtn">Copy Summary</button></div>
     </div>
@@ -161,31 +257,82 @@
 const $ = (id) => document.getElementById(id);
 const debounce = (func, delay) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), delay); }; };
 const num = (v) => { const x = parseFloat(v); return isNaN(x) ? null : x; };
+const makeTag = (txt, cls) => `<span class="tag ${cls}">${txt}</span>`;
 
-// --- [MODIFIED] APP STATE ---
+// --- APP STATE ---
 const inputs = [
-    'ptName','ptMrn','ptAge','ptWt','ptLoc','ptAdmissionReason','icuLos',
-    'oxMod','npFlow','np3Last12h','hfnpFio2','hfnpFlow','rapidWean','pressors24h',
-    'adds','gcs','confused','lactate','akiConcern','uopLow','infectionConcern',
-    'override','overrideNote','elec','nutrition','lines','bowel','msk','psych'
+    'ptName','ptMrn','ptAge','ptLoc','ptAdmissionReason','icuLos',
+    'oxMod','npFlow','np3Last12h','hfnpFio2','hfnpFlow','nivDetails','rapidWean','pressors24h','after_hours_discharge',
+    'adds','lactate','confused','akiConcern','uopLow','infectionConcern',
+    'override','overrideNote',
+    'use_mods','mods_score','mods_details',
+    'airway_a', 'b_rr', 'b_spo2', 'b_device', 'b_wob', 'c_hr', 'c_nibp', 'c_cr', 'c_perf',
+    'd_alert', 'd_gcs', 'd_pain', 'e_temp', 'e_bsl', 'e_uop',
+    'bl_wcc','bl_wcc_trend','bl_hb','bl_hb_trend','bl_plts','bl_plts_trend','bl_k','bl_k_trend',
+    'bl_cr_review','bl_cr_review_trend','bl_mg','bl_mg_trend','bl_alb','bl_alb_trend','bl_lac_review','bl_lac_review_trend',
+    'elec_replace_note','new_bloods_ordered',
+    'dev_idc','dev_pivc_1','dev_pivc_loc_1','dev_pivc_2','dev_pivc_loc_2',
+    'dev_cvad','dev_cvad_type','dev_tube','dev_tube_type','dev_drain_1','dev_drain_loc_1',
+    'dev_drain_2','dev_drain_loc_2','dev_pacing','dev_other','dev_other_note'
 ];
-const sr_inputs = { 'Electrolytes': 'elec', 'Nutrition': 'nutrition', 'Lines/Drains': 'lines', 'Bowel': 'bowel', 'Mobility': 'msk', 'Psychosocial': 'psych' };
+
+const normalRanges = {
+    wcc: { low: 4, high: 11 }, hb: { low: 115, high: 165 },
+    plts: { low: 150, high: 400 }, k: { low: 3.5, high: 5.2 },
+    cr_review: { low: 50, high: 98 }, mg: { low: 0.7, high: 1.1 },
+    alb: { low: 35, high: 50 }, lac_review: { low: 0.5, high: 2.0 }
+};
 
 // --- EVENT HANDLING ---
 function initialize() {
-    setInterval(() => { $('now').textContent = new Date().toLocaleString('en-AU'); }, 1000);
-    $('now').textContent = new Date().toLocaleString('en-AU');
-    $('oxMod').addEventListener('change', () => { toggleOxyFields(); computeAll(); });
-    toggleOxyFields();
     const debouncedCompute = debounce(computeAll, 250);
+    
+    $('oxMod').addEventListener('change', () => { toggleOxyFields(); debouncedCompute(); });
+    toggleOxyFields();
+    
+    $('use_mods').addEventListener('change', () => {
+        const modsSection = $('mods_inputs');
+        if (modsSection) {
+            modsSection.style.display = $('use_mods').checked ? 'block' : 'none';
+        }
+        debouncedCompute();
+    });
+
     inputs.forEach(id => {
         const el = $(id); if (!el) return;
         const eventType = (el.type === 'checkbox' || el.tagName === 'SELECT') ? 'change' : 'input';
         el.addEventListener(eventType, debouncedCompute);
     });
+    
+    // Override Buttons
+    const overrideBtns = { amber: $('override_amber'), red: $('override_red'), clear: $('override_clear') };
+    const overrideInput = $('override');
+    const reasonBox = $('override_reason_box');
+    
+    const setOverride = (level) => {
+        overrideInput.value = level;
+        reasonBox.style.display = (level === 'none') ? 'none' : 'block';
+        if(level === 'none') {$('overrideNote').value = '';}
+        overrideBtns.amber.classList.toggle('active', level === 'amber');
+        overrideBtns.red.classList.toggle('active', level === 'red');
+        debouncedCompute();
+    };
+    
+    overrideBtns.amber.addEventListener('click', () => setOverride('amber'));
+    overrideBtns.red.addEventListener('click', () => setOverride('red'));
+    overrideBtns.clear.addEventListener('click', () => setOverride('none'));
+
     $('copyBtn').addEventListener('click', async () => {
         try { await navigator.clipboard.writeText($('summary').value); alert('Summary copied.'); } catch (e) { alert('Copy failed.'); }
     });
+    
+    document.querySelectorAll('.accordion').forEach(el => {
+        el.addEventListener('click', function() {
+            this.classList.toggle('active');
+            this.nextElementSibling.style.display = this.nextElementSibling.style.display === "block" ? "none" : "block";
+        });
+    });
+
     computeAll();
 }
 
@@ -193,6 +340,7 @@ function toggleOxyFields() {
     const mod = $('oxMod').value;
     document.querySelectorAll('.npOnly').forEach(el => el.style.display = (mod === 'NP') ? '' : 'none');
     document.querySelectorAll('.hfnpOnly').forEach(el => el.style.display = (mod === 'HFNP') ? '' : 'none');
+    document.querySelectorAll('.nivOnly').forEach(el => el.style.display = (mod === 'NIV') ? '' : 'none');
 }
 
 // --- CORE LOGIC ---
@@ -200,98 +348,77 @@ function getState() {
     const state = {};
     for (const id of inputs) {
         const el = $(id);
-        if (el) {
-            state[id] = el.type === 'checkbox' ? el.checked : el.value;
-        }
+        if (el) { state[id] = el.type === 'checkbox' ? el.checked : el.value; }
     }
     return state;
 }
 
-// --- [MODIFIED] CORE LOGIC ---
+function updateBloodFlags(s) {
+    for (const [key, range] of Object.entries(normalRanges)) {
+        const val = num(s[`bl_${key}`]);
+        const inputEl = $(`bl_${key}`);
+        if (!inputEl) continue;
+        
+        inputEl.classList.remove('blood-abnormal');
+        if (val !== null && (val < range.low || val > range.high)) {
+            inputEl.classList.add('blood-abnormal');
+        }
+    }
+}
+
 function computeAll() {
     const s = getState();
-    const red = [];
-    const amber = [];
+    const red = [], amber = [];
 
-    // --- FLAG COMPUTATIONS ---
-
-    // Oxygen Modality
+    if (s.after_hours_discharge) { red.push('Discharged after-hours (first night on ward)'); }
     if (s.oxMod === 'NP') {
         const flow = num(s.npFlow);
-        if (s.np3Last12h || (flow !== null && flow >= 3)) {
-            red.push('FiO₂: NP ≥3 L/min');
-        } else if (flow !== null && flow >= 2 && flow < 3) {
-            amber.push('FiO₂: NP 2-2.5 L/min');
-        }
+        if (s.np3Last12h || (flow !== null && flow >= 3)) { red.push('Significant FiO₂ use'); } 
+        else if (flow !== null && flow >= 2 && flow < 3) { amber.push('FiO₂: NP 2-2.5 L/min'); }
     } else if (s.oxMod === 'HFNP') {
-        const fio2 = num(s.hfnpFio2);
-        const flow = num(s.hfnpFlow);
-        if ((fio2 !== null && fio2 >= 40) || (flow !== null && flow >= 40)) {
-            red.push('FiO₂: HFNP ≥40% or ≥40 L/min');
-        } else if ((fio2 !== null && fio2 > 21) || (flow !== null && flow > 0)) {
-            amber.push('On HFNP (low settings)');
-        }
+        const fio2 = num(s.hfnpFio2), flow = num(s.hfnpFlow);
+        if (s.np3Last12h || (fio2 !== null && fio2 > 30) || (flow !== null && flow > 30)) { red.push('Significant FiO₂ use'); } 
+        else if ((fio2 !== null && fio2 > 21) || (flow !== null && flow > 0)) { amber.push('On HFNP (low settings)'); }
+    } else if (s.oxMod === 'NIV') {
+        red.push('NIV');
     }
-    
-    // ICU Length of Stay
+    if (s.np3Last12h && s.oxMod === 'RA') {
+        amber.push('Rapid Wean: O₂ in last 12h, now on RA');
+    }
     const los = num(s.icuLos);
-    if (los !== null && los > 3) {
-        amber.push(`ICU LOS >3 days (is ${los})`);
-    }
-
-    // Standalone Red Flags
-    if (s.rapidWean) { red.push('Rapid wean HFNP→NP'); }
+    if (los !== null && los > 3) { amber.push(`ICU LOS ${los} days`); }
+    if (s.rapidWean) { red.push('Rapid oxygen wean in last 12h'); }
     if (s.pressors24h) { red.push('Vasopressors in last 24h'); }
-    if (s.confused) { red.push('Altered Cognition: Confused'); }
-    if (s.akiConcern) { red.push('AKI / Creatinine Concern'); }
-    if (s.uopLow) { red.push('Oliguria Concern'); }
-    if (s.infectionConcern) { red.push('Clinical infection concern'); }
-
-    // ADDS Score
+    if (s.confused) { red.push('Confused'); }
+    if (s.akiConcern) { red.push('AKI / concerning Creatinine rise'); }
+    if (s.uopLow) { red.push('UOP concerning / downtrending'); }
+    if (s.infectionConcern) { red.push('Concern for infection'); }
     const adds = num(s.adds);
-    if (adds !== null && adds >= 3) {
-        red.push(`ADDS ≥3 (is ${adds})`);
-    }
-
-    // GCS Score
-    const gcs = num(s.gcs);
-    if (gcs !== null && gcs < 15) {
-        red.push(`Altered Cognition: GCS < 15 (is ${gcs})`);
-    }
-
-    // Lactate Level
+    if(adds !== null && adds >= 3) { red.push(`ADDS ${adds}`);}
     const l = num(s.lactate);
-    if (l !== null && l > 2.5) {
-        red.push(`Lactate > 2.5 (is ${l})`);
-    } else if (l !== null && l >= 2.0) {
-        amber.push(`Lactate 2.0-2.5 (is ${l})`);
-    }
-
-    // Overrides
+    if (l !== null && l > 2.5) { red.push(`Lactate ${l}`); } 
+    else if (l !== null && l >= 2.0) { amber.push(`Lactate ${l}`); }
+    
     const note = s.overrideNote ? ` (${s.overrideNote})` : '';
-    if (s.override === 'red') {
-        red.push(`Override: Red concern${note}`);
-    } else if (s.override === 'amber') {
-        amber.push(`Override: Amber concern${note}`);
-    }
+    if (s.override === 'red') { red.push(`Override: Red concern${note}`); } 
+    else if (s.override === 'amber') { amber.push(`Override: Amber concern${note}`); }
 
+    updateBloodFlags(s);
     updateDisplay(s, red, amber);
 }
 
-
+// --- DISPLAY LOGIC ---
 function updateDisplay(s, red, amber) {
     const redCount = red.length, amberCount = amber.length;
-    const cat = (redCount > 0) ? {id: 'red', text: '🛑 HIGH (CAT 1)', follow: '72h'} :
-                  (amberCount > 0) ? {id: 'amber', text: '🟠 MODERATE (CAT 2)', follow: '48h'} :
-                  {id: 'green', text: '🟢 LOW', follow: '24h'};
+    const cat = (redCount > 0) ? {id: 'red', text: '🛑 HIGH', catNum: 1, follow: '72h'} :
+                  (amberCount > 0) ? {id: 'amber', text: '🟠 MODERATE', catNum: 2, follow: '48h'} :
+                  {id: 'green', text: '🟢 LOW', catNum: 3, follow: '24h'};
 
     $('redCount').textContent = redCount; 
     $('amberCount').textContent = amberCount;
     $('catText').className = 'status ' + cat.id; 
     $('catText').textContent = cat.text;
-    $('followUp').textContent = cat.follow;
     
-    const makeTag = (txt, cls) => `<span class="tag ${cls}">${txt}</span>`;
     const flagListEl = $('flagList');
     if (redCount > 0 || amberCount > 0) {
         flagListEl.innerHTML = [...red.map(f => makeTag(f, 'red')), ...amber.map(f => makeTag(f, 'amber'))].join('');
@@ -299,23 +426,63 @@ function updateDisplay(s, red, amber) {
         flagListEl.innerHTML = makeTag('No risk factors identified', 'green');
     }
     
-    // Summary Text
-    const lines = [ `Patient: ${s.ptName||'--'} | MRN: ${s.ptMrn||'--'} | Location: ${s.ptLoc||'--'}`,
+    // --- SUMMARY TEXT GENERATION ---
+    const lines = [ 'ALERT CNS Review',
+        `Patient: ${s.ptName||'--'} | MRN: ${s.ptMrn||'--'} | Location: ${s.ptLoc||'--'}`,
         `ICU Admission: ${s.ptAdmissionReason || 'Not specified'}`, `---`,
-        `ASSESSMENT: ${cat.text.substring(2)}. Flags CAT 1/2: ${redCount}/${amberCount}. Suggested Follow-Up: ${cat.follow}.`];
-    if (red.length > 0) lines.push('CAT 1 FLAGS: ' + red.join('; '));
-    if (amber.length > 0) lines.push('CAT 2 FLAGS: ' + amber.join('; '));
+        `Assessment Category: ${cat.catNum}.`];
     
-    const sr_summary = [];
-    for(const [label, id] of Object.entries(sr_inputs)){
-        if(s[id]) sr_summary.push(`${label}: ${s[id]}`);
+    const allFlags = [...red, ...amber];
+    if (allFlags.length > 0) {
+        lines.push(`Identified Risk Factors: ${allFlags.join('; ')}.`);
     }
-    if(sr_summary.length > 0){
-        lines.push('---', 'STRUCTURED REVIEW:', ...sr_summary);
-    }
+
+    const score_line = s.use_mods
+        ? [s.mods_score ? `MODS Score: ${s.mods_score}`:null, s.mods_details ? `Details: ${s.mods_details}`:null].filter(Boolean).join(' | ')
+        : s.adds ? `ADDS: ${s.adds}` : '';
+    const a_line = s.airway_a ? `A: ${s.airway_a}` : '';
+    const b_line = [s.b_rr ? `RR ${s.b_rr}`:null, s.b_spo2 ? `SpO₂ ${s.b_spo2}%`:null, s.b_device||null, s.b_wob ? `WOB ${s.b_wob}`:null].filter(Boolean).join(', ');
+    const c_line = [s.c_hr ? `HR ${s.c_hr}`:null, s.c_nibp ? `NIBP ${s.c_nibp}`:null, s.c_cr ? `CR ${s.c_cr}s`:null, s.c_perf||null].filter(Boolean).join(', ');
+    const d_line = [s.d_alert||null, s.d_gcs ? `GCS ${s.d_gcs}`:null, s.d_pain ? `Pain ${s.d_pain}`:null].filter(Boolean).join(', ');
+    const e_line = [s.e_temp ? `T ${s.e_temp}°C`:null, s.e_bsl ? `BSL ${s.e_bsl}`:null, s.e_uop ? `UOP ${s.e_uop}`:null].filter(Boolean).join(', ');
+    const atoe_summary = [score_line, a_line, b_line ? `B: ${b_line}`:null, c_line ? `C: ${c_line}`:null, d_line ? `D: ${d_line}`:null, e_line ? `E: ${e_line}`:null].filter(Boolean);
+    if(atoe_summary.length > 0) { lines.push('---', 'A-E ASSESSMENT:', ...atoe_summary); }
+
+    const systems_summary = [];
+    const trendWord = (val) => {
+        if(val === '↑') return ' (uptrending)'; if(val === '↓') return ' (downtrending)';
+        if(val === '→') return ' (stable)'; return '';
+    };
+    const bloods = [
+        s.bl_lac_review ? `Lac ${s.bl_lac_review}${trendWord(s.bl_lac_review_trend)}`:null,
+        s.bl_wcc ? `WCC ${s.bl_wcc}${trendWord(s.bl_wcc_trend)}`:null, 
+        s.bl_cr_review ? `Cr ${s.bl_cr_review}${trendWord(s.bl_cr_review_trend)}`:null, 
+        s.bl_k ? `K ${s.bl_k}${trendWord(s.bl_k_trend)}`:null, 
+        s.bl_mg ? `Mg ${s.bl_mg}${trendWord(s.bl_mg_trend)}`:null, 
+        s.bl_hb ? `Hb ${s.bl_hb}${trendWord(s.bl_hb_trend)}`:null, 
+        s.bl_plts ? `Plts ${s.bl_plts}${trendWord(s.bl_plts_trend)}`:null, 
+        s.bl_alb ? `Alb ${s.bl_alb}${trendWord(s.bl_alb_trend)}`:null
+    ].filter(Boolean).join(', ');
+    if(bloods) systems_summary.push(`Bloods: ${bloods}`);
+    if(s.elec_replace_note) systems_summary.push(`Electrolyte Plan: ${s.elec_replace_note}`);
+    if(s.new_bloods_ordered) systems_summary.push(`Plan: New bloods ordered for next round.`);
+
+    const deviceText = (base, detail) => detail ? `${base} (${detail})` : base;
+    const pivcs = [s.dev_pivc_1 ? deviceText('PIVC', s.dev_pivc_loc_1) : null, s.dev_pivc_2 ? deviceText('PIVC', s.dev_pivc_loc_2) : null].filter(Boolean);
+    const drains = [s.dev_drain_1 ? deviceText('Drain', s.dev_drain_loc_1) : null, s.dev_drain_2 ? deviceText('Drain', s.dev_drain_loc_2) : null].filter(Boolean);
+    const device_parts = [
+        s.dev_idc ? 'IDC' : null, ...pivcs,
+        s.dev_cvad ? deviceText('CVAD', s.dev_cvad_type) : null,
+        s.dev_tube ? deviceText(s.dev_tube_type || 'Enteral Tube', null) : null, ...drains,
+        s.dev_pacing ? 'Pacing Wires' : null,
+        s.dev_other && s.dev_other_note ? s.dev_other_note : null
+    ].filter(Boolean);
+    if(device_parts.length > 0) systems_summary.push(`Devices: ${device_parts.join(', ')}`);
+    
+    if(systems_summary.length > 0) { lines.push('---', 'Bloods and Devices:', ...systems_summary); }
+
     $('summary').value = lines.join('\n');
     
-    // Sticky Footer
     $('footerName').textContent = s.ptName || '--';
     $('footerLoc').textContent = s.ptLoc || '--';
     $('footerReason').textContent = s.ptAdmissionReason || '--';
