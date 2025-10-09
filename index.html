@@ -168,7 +168,7 @@ const inputs = [
 ];
 const sr_inputs = { 'Electrolytes': 'elec', 'Nutrition': 'nutrition', 'Lines/Drains': 'lines', 'Bowel': 'bowel', 'Mobility': 'msk', 'Psychosocial': 'psych' };
 
-// --- INITIALIZATION ---
+// --- EVENT HANDLING ---
 function initialize() {
     setInterval(() => { $('now').textContent = new Date().toLocaleString('en-AU'); }, 1000);
     $('now').textContent = new Date().toLocaleString('en-AU');
@@ -192,9 +192,20 @@ function toggleOxyFields() {
     document.querySelectorAll('.hfnpOnly').forEach(el => el.style.display = (mod === 'HFNP') ? '' : 'none');
 }
 
-// --- CORE CALCULATION LOGIC ---
+// --- CORE LOGIC ---
+function getState() {
+    const state = {};
+    for (const id of inputs) {
+        const el = $(id);
+        if (el) {
+            state[id] = el.type === 'checkbox' ? el.checked : el.value;
+        }
+    }
+    return state;
+}
+
 function computeAll() {
-    const s = {}; inputs.forEach(id => { const e=$(id); if(e) s[id] = e.type==='checkbox' ? e.checked : e.value; });
+    const s = getState();
     const red = [], amber = [];
 
     // --- FLAG COMPUTATIONS ---
@@ -211,9 +222,9 @@ function computeAll() {
     if (s.pressors24h) red.push('Vasopressors in last 24h');
     const adds = num(s.adds); if (adds >= 3) red.push(`ADDS ≥3 (is ${adds})`);
     if (s.confused) red.push('Altered Cognition: Confused');
-    const gcs = num(s.gcs); if (gcs < 15) red.push(`Altered Cognition: GCS < 15 (is ${gcs})`);
+    const gcs = num(s.gcs); if (gcs !== null && gcs < 15) red.push(`Altered Cognition: GCS < 15 (is ${gcs})`);
     const l = num(s.lactate);
-    if (l > 2.5) red.push(`Lactate > 2.5 (is ${l})`); else if (l >= 2.0) amber.push(`Lactate 2.0-2.5 (is ${l})`);
+    if (l !== null && l > 2.5) red.push(`Lactate > 2.5 (is ${l})`); else if (l !== null && l >= 2.0) amber.push(`Lactate 2.0-2.5 (is ${l})`);
     if (s.akiConcern) red.push('AKI / Creatinine Concern');
     if (s.uopLow) red.push('Oliguria Concern');
     if (s.infectionConcern) red.push('Clinical infection concern');
@@ -226,27 +237,30 @@ function computeAll() {
 
 function updateDisplay(s, red, amber) {
     const redCount = red.length, amberCount = amber.length;
-    $('redCount').textContent = redCount; $('amberCount').textContent = amberCount;
     const cat = (redCount > 0) ? {id: 'red', text: '🛑 HIGH (CAT 1)', follow: '72h'} :
                 (amberCount > 0) ? {id: 'amber', text: '🟠 MODERATE (CAT 2)', follow: '48h'} :
                 {id: 'green', text: '🟢 LOW', follow: '24h'};
 
-    $('catText').className = 'status ' + cat.id; $('catText').textContent = cat.text;
+    $('redCount').textContent = redCount; 
+    $('amberCount').textContent = amberCount;
+    $('catText').className = 'status ' + cat.id; 
+    $('catText').textContent = cat.text;
     $('followUp').textContent = cat.follow;
     
     const makeTag = (txt, cls) => `<span class="tag ${cls}">${txt}</span>`;
+    const flagListEl = $('flagList');
     if (redCount > 0 || amberCount > 0) {
-        $('flagList').innerHTML = [...red.map(f => makeTag(f, 'red')), ...amber.map(f => makeTag(f, 'amber'))].join('');
+        flagListEl.innerHTML = [...red.map(f => makeTag(f, 'red')), ...amber.map(f => makeTag(f, 'amber'))].join('');
     } else {
-        $('flagList').innerHTML = makeTag('No risk factors identified', 'green');
+        flagListEl.innerHTML = makeTag('No risk factors identified', 'green');
     }
     
     // Summary Text
     const lines = [ `Patient: ${s.ptName||'--'} | MRN: ${s.ptMrn||'--'} | Location: ${s.ptLoc||'--'}`,
         `ICU Admission: ${s.ptAdmissionReason || 'Not specified'}`, `---`,
         `ASSESSMENT: ${cat.text.substring(2)}. Flags CAT 1/2: ${redCount}/${amberCount}. Suggested Follow-Up: ${cat.follow}.`];
-    if (red.length) lines.push('CAT 1 FLAGS: ' + red.join('; '));
-    if (amber.length) lines.push('CAT 2 FLAGS: ' + amber.join('; '));
+    if (red.length > 0) lines.push('CAT 1 FLAGS: ' + red.join('; '));
+    if (amber.length > 0) lines.push('CAT 2 FLAGS: ' + amber.join('; '));
     
     const sr_summary = [];
     for(const [label, id] of Object.entries(sr_inputs)){
