@@ -204,42 +204,77 @@ function getState() {
     return state;
 }
 
+// --- [FIXED] CORE LOGIC ---
 function computeAll() {
     const s = getState();
-    const red = [], amber = [];
+    const red = [];
+    const amber = [];
 
     // --- FLAG COMPUTATIONS ---
+
+    // Oxygen Modality
     if (s.oxMod === 'NP') {
         const flow = num(s.npFlow);
-        if (s.np3Last12h || (flow !== null && flow >= 3)) red.push('FiO₂: NP ≥3 L/min');
-        else if (flow >= 2 && flow < 3) amber.push('FiO₂: NP 2-2.5 L/min');
+        if (s.np3Last12h || (flow !== null && flow >= 3)) {
+            red.push('FiO₂: NP ≥3 L/min');
+        } else if (flow !== null && flow >= 2 && flow < 3) {
+            amber.push('FiO₂: NP 2-2.5 L/min');
+        }
     } else if (s.oxMod === 'HFNP') {
-        const fio2=num(s.hfnpFio2), flow=num(s.hfnpFlow);
-        if ((fio2 && fio2 >= 40) || (flow && flow >= 40)) red.push('FiO₂: HFNP ≥40% or ≥40 L/min');
-        else if (fio2 > 21 || flow > 0) amber.push('On HFNP (low settings)');
+        const fio2 = num(s.hfnpFio2);
+        const flow = num(s.hfnpFlow);
+        if ((fio2 !== null && fio2 >= 40) || (flow !== null && flow >= 40)) {
+            red.push('FiO₂: HFNP ≥40% or ≥40 L/min');
+        } else if ((fio2 !== null && fio2 > 21) || (flow !== null && flow > 0)) {
+            amber.push('On HFNP (low settings)');
+        }
     }
-    if (s.rapidWean) red.push('Rapid wean HFNP→NP');
-    if (s.pressors24h) red.push('Vasopressors in last 24h');
-    const adds = num(s.adds); if (adds >= 3) red.push(`ADDS ≥3 (is ${adds})`);
-    if (s.confused) red.push('Altered Cognition: Confused');
-    const gcs = num(s.gcs); if (gcs !== null && gcs < 15) red.push(`Altered Cognition: GCS < 15 (is ${gcs})`);
+    
+    // Standalone Red Flags
+    if (s.rapidWean) { red.push('Rapid wean HFNP→NP'); }
+    if (s.pressors24h) { red.push('Vasopressors in last 24h'); }
+    if (s.confused) { red.push('Altered Cognition: Confused'); }
+    if (s.akiConcern) { red.push('AKI / Creatinine Concern'); }
+    if (s.uopLow) { red.push('Oliguria Concern'); }
+    if (s.infectionConcern) { red.push('Clinical infection concern'); }
+
+    // ADDS Score
+    const adds = num(s.adds);
+    if (adds !== null && adds >= 3) {
+        red.push(`ADDS ≥3 (is ${adds})`);
+    }
+
+    // GCS Score
+    const gcs = num(s.gcs);
+    if (gcs !== null && gcs < 15) {
+        red.push(`Altered Cognition: GCS < 15 (is ${gcs})`);
+    }
+
+    // Lactate Level
     const l = num(s.lactate);
-    if (l !== null && l > 2.5) red.push(`Lactate > 2.5 (is ${l})`); else if (l !== null && l >= 2.0) amber.push(`Lactate 2.0-2.5 (is ${l})`);
-    if (s.akiConcern) red.push('AKI / Creatinine Concern');
-    if (s.uopLow) red.push('Oliguria Concern');
-    if (s.infectionConcern) red.push('Clinical infection concern');
+    if (l !== null && l > 2.5) {
+        red.push(`Lactate > 2.5 (is ${l})`);
+    } else if (l !== null && l >= 2.0) {
+        amber.push(`Lactate 2.0-2.5 (is ${l})`);
+    }
+
+    // Overrides
     const note = s.overrideNote ? ` (${s.overrideNote})` : '';
-    if (s.override === 'red') red.push(`Override: Red concern${note}`);
-    if (s.override === 'amber') amber.push(`Override: Amber concern${note}`);
+    if (s.override === 'red') {
+        red.push(`Override: Red concern${note}`);
+    } else if (s.override === 'amber') {
+        amber.push(`Override: Amber concern${note}`);
+    }
 
     updateDisplay(s, red, amber);
 }
 
+
 function updateDisplay(s, red, amber) {
     const redCount = red.length, amberCount = amber.length;
     const cat = (redCount > 0) ? {id: 'red', text: '🛑 HIGH (CAT 1)', follow: '72h'} :
-                (amberCount > 0) ? {id: 'amber', text: '🟠 MODERATE (CAT 2)', follow: '48h'} :
-                {id: 'green', text: '🟢 LOW', follow: '24h'};
+                  (amberCount > 0) ? {id: 'amber', text: '🟠 MODERATE (CAT 2)', follow: '48h'} :
+                  {id: 'green', text: '🟢 LOW', follow: '24h'};
 
     $('redCount').textContent = redCount; 
     $('amberCount').textContent = amberCount;
