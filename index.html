@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>ALERT Nursing Risk Assessment Tool</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root{
       --bg:#f0f9f9; --card:#ffffff; --ink:#111827; --muted:#4b5563; --accent:#007a7a;
@@ -16,7 +16,19 @@
     html,body{height:100%}
     body{font-family:'Inter', system-ui, sans-serif; background:var(--bg); color:var(--ink); margin:0 0 110px 0; line-height:1.4; -webkit-font-smoothing:antialiased;}
     header{padding:14px 18px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:12px; flex-wrap:wrap; background: var(--card); position:sticky; top:0; z-index:30;}
-    header h1{font-size:1.05rem; margin:0; flex:1; font-weight:600}
+    header h1 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: -0.5px;
+      margin: 0;
+      flex: 1;
+    }
+    header h1 .logo-em {
+      color: var(--red);
+      margin-left: 2px;
+      font-weight: 800;
+    }
     .top-meta { font-size:0.9rem; color:var(--muted); margin-left:8px; white-space:nowrap; }
     .last-saved { font-size:0.85rem; color:var(--muted); margin-left:8px; }
     .container{max-width:980px; margin:12px auto; padding:12px;}
@@ -41,6 +53,16 @@
     .button-group { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
     .kpi{display:grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap:12px;}
     .kpi .box{background:var(--bg); border:1px solid var(--line); padding:12px; border-radius:12px; text-align:center}
+    #categoryBox {
+        padding: 16px 12px;
+        border-width: 2px;
+        transition: border-color 0.2s;
+    }
+    #categoryBox h3 {
+        font-size: 2.25rem;
+        margin-top: 4px;
+        font-weight: 800;
+    }
     .kpi .box h3{margin:0; font-size:1.25rem}
     .kpi .box small{color:var(--muted); font-size: 0.8rem;}
     .status{font-weight:700}
@@ -81,10 +103,10 @@
     }
     .accordion .icon { color: var(--muted); font-size:0.9rem; margin-left:8px; }
     .panel { padding: 14px; background-color: transparent; display: none; overflow: hidden; }
-    .pivc-entry, .wound-entry {
+    .pivc-entry, .wound-entry, .drain-entry {
       background: var(--card); border:1px solid var(--line); border-radius:12px; padding:10px; margin-bottom:10px; display:flex; flex-direction:column; gap:8px;
     }
-    .pivc-entry textarea, .wound-entry textarea { width:100%; min-height:70px; font-size:1rem; background:var(--input-bg); }
+    .pivc-entry textarea, .wound-entry textarea, .drain-entry textarea { width:100%; min-height:70px; font-size:1rem; background:var(--input-bg); }
     .remove-entry { background: transparent; border:1px solid rgba(239,68,68,0.12); color:var(--red); border-radius:8px; padding:8px; cursor:pointer; text-align:center; font-weight:700; }
     .remove-entry:hover { background: rgba(239,68,68,0.04); }
     .floating-toolbar { display:none; position:fixed; right:12px; bottom:72px; z-index:35; gap:8px; flex-direction:column; }
@@ -132,7 +154,7 @@
 </head>
 <body>
 <header role="banner">
-  <h1>ALERT Nursing Risk Assessment Tool</h1>
+  <h1>ALERT<span class="logo-em">!</span> Nursing Risk Assessment Tool</h1>
   <div class="top-meta last-saved" id="lastSaved">Last saved: --:--</div>
   <div style="display:flex; gap:8px; align-items:center;">
     <button class="btn small" id="darkToggle" aria-pressed="false">Dark mode</button>
@@ -145,23 +167,31 @@
     <div class="grid">
       <div class="col-6"><label for="ptName">Patient Initials</label><input id="ptName" type="text" autocomplete="off" /></div>
       <div class="col-6"><label for="ptMrn">Last 3 digits of URN</label><input id="ptMrn" type="text" autocomplete="off" /></div>
-      <div class="col-4"><label for="ptAge">Age</label><input id="ptAge" type="number" min="0" /></div>
-      <div class="col-4"><label for="icuLos">ICU LOS (days)</label><input id="icuLos" type="number" min="0" /></div>
-      <div class="col-4"><label for="ptLoc">Location/Bed</label><input id="ptLoc" type="text" /></div>
+      <div class="col-3"><label for="ptAge">Age</label><input id="ptAge" type="number" min="0" /></div>
+      <div class="col-3"><label for="icuLos">ICU LOS (days)</label><input id="icuLos" type="number" min="0" /></div>
+      <div class="col-6"><label for="ptLoc">Location/Bed</label><input id="ptLoc" type="text" /></div>
       <div class="col-12"><label for="ptAdmissionReason">Primary Reason for ICU Admission</label><input id="ptAdmissionReason" type="text" /></div>
       <div class="col-4">
-        <label for="reviewType">Review Type</label>
+        <label>Review Type</label>
         <div style="display:flex; gap:8px; padding-top:6px;">
-          <label style="font-weight:500"><input type="radio" name="reviewType" id="reviewPre" value="pre"> Pre-Stepdown</label>
-          <label style="font-weight:500"><input type="radio" name="reviewType" id="reviewPost" value="post" checked> Post-Stepdown</label>
+          <label style="font-weight:500"><input type="radio" name="reviewType" value="pre"> Pre-Stepdown</label>
+          <label style="font-weight:500"><input type="radio" name="reviewType" value="post" checked> Post-Stepdown</label>
+        </div>
+      </div>
+      <div class="col-4">
+        <label>Clinician Role</label>
+        <div style="display:flex; gap:8px; padding-top:6px;">
+          <label style="font-weight:500"><input type="radio" name="clinicianRole" value="ALERT CNS" checked> CNS</label>
+          <label style="font-weight:500"><input type="radio" name="clinicianRole" value="ALERT CN"> CN</label>
         </div>
       </div>
       <div class="col-4"><label>Stepdown Date</label><input type="date" id="stepdownDate"></div>
-      <div class="col-4">
+      <div class="col-12">
         <label>Stepdown Time</label>
         <div class="button-group" id="stepdownTime" role="tablist">
           <button class="select-btn" data-value="Morning">Morning</button>
           <button class="select-btn" data-value="Afternoon">Afternoon</button>
+          <button class="select-btn" data-value="Evening">Evening</button>
           <button class="select-btn" data-value="Night">Night</button>
         </div>
       </div>
@@ -263,7 +293,7 @@
 
   <div class="card">
     <div class="kpi">
-      <div class="box"><small>Category</small><h3 id="catText" class="status green">CAT 3</h3></div>
+      <div class="box" id="categoryBox"><small>Category</small><h3 id="catText" class="status green">CAT 3</h3></div>
       <div class="box"><small>CAT 1 Flags</small><h3 id="redCount">0</h3></div>
       <div class="box"><small>CAT 2 Flags</small><h3 id="amberCount">0</h3></div>
     </div>
@@ -368,6 +398,12 @@
             <div class="toggle-label" id="toggle_dev_pacing" data-value="false" role="button" aria-pressed="false">Pacing Wires <span class="state">No</span></div>
         </div>
 
+        <div class="devices-subtitle">▶ Drains</div>
+        <div class="devices-input-group">
+            <div id="drain-container" aria-live="polite"></div>
+            <button class="btn" id="add-drain" style="margin-top:4px;">+ Add Drain</button>
+        </div>
+
         <hr style="margin: 18px 0;" />
 
         <div class="devices-subtitle">▶ Wounds</div>
@@ -378,7 +414,7 @@
 
         <div class="devices-subtitle">▶ Other</div>
         <div class="devices-input-group">
-            <textarea id="dev_other_note" placeholder="e.g. additional drains or wounds"></textarea>
+            <textarea id="dev_other_note" placeholder="e.g. additional notes"></textarea>
         </div>
     </div>
   </div>
@@ -543,10 +579,32 @@ function createWoundEntry(value='') {
   div.scrollIntoView({ behavior:'smooth', block:'center' });
   return div;
 }
+function createDrainEntry(value='') {
+  const container = $('drain-container');
+  const index = container.querySelectorAll('.drain-entry').length + 1;
+  const div = document.createElement('div'); div.className = 'drain-entry';
+  div.innerHTML = `<label>Drain #${index}</label>
+    <textarea placeholder="Note drain type, location, output etc.">${value}</textarea>
+    <div style="display:flex; gap:8px;">
+      <div class="remove-entry" role="button" tabindex="0">Remove</div>
+    </div>`;
+  container.appendChild(div);
+  const ta = div.querySelector('textarea');
+  ta.addEventListener('input', debounce(()=>{ computeAll(); saveState(); },300));
+  const rem = div.querySelector('.remove-entry');
+  rem.addEventListener('click', ()=> { div.remove(); computeAll(); saveState(); renumberEntries('drain'); });
+  rem.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); div.remove(); computeAll(); saveState(); renumberEntries('drain'); }});
+  div.scrollIntoView({ behavior:'smooth', block:'center' });
+  return div;
+}
 function renumberEntries(kind='pivc') {
-  const container = (kind==='pivc') ? $('pivc-container') : $('wound-container');
+  let container, prefix;
+  if (kind === 'pivc') { container = $('pivc-container'); prefix = 'PIVC #'; }
+  else if (kind === 'wound') { container = $('wound-container'); prefix = 'Wound #'; }
+  else if (kind === 'drain') { container = $('drain-container'); prefix = 'Drain #'; }
+  if (!container) return;
   const labels = container.querySelectorAll('label');
-  labels.forEach((lab, i)=> lab.textContent = (kind==='pivc') ? `PIVC #${i+1}` : `Wound #${i+1}`);
+  labels.forEach((lab, i)=> lab.textContent = `${prefix}${i+1}`);
 }
 
 /* ===========================
@@ -569,12 +627,16 @@ function getState() {
     const active = el.querySelector('.select-btn.active');
     state[groupId] = active ? active.dataset.value : '';
   }
-  const checked = document.querySelector('input[name="reviewType"]:checked');
+  let checked = document.querySelector('input[name="reviewType"]:checked');
   state['reviewType'] = checked ? checked.value : 'post';
+
+  checked = document.querySelector('input[name="clinicianRole"]:checked');
+  state['clinicianRole'] = checked ? checked.value : 'ALERT CNS';
 
   // Dynamic lists
   state.pivcs = Array.from(document.querySelectorAll('#pivc-container .pivc-entry textarea')).map(t=>t.value.trim()).filter(Boolean);
   state.wounds = Array.from(document.querySelectorAll('#wound-container .wound-entry textarea')).map(t=>t.value.trim()).filter(Boolean);
+  state.drains = Array.from(document.querySelectorAll('#drain-container .drain-entry textarea')).map(t=>t.value.trim()).filter(Boolean);
 
   // footer / misc
   return state;
@@ -600,17 +662,26 @@ function restoreState(state) {
     const btn = $(groupId).querySelector(`.select-btn[data-value="${value}"]`);
     if (btn) btn.classList.add('active');
   }
-  const radioState = state['reviewType'];
+  let radioState = state['reviewType'];
   if (radioState) {
     const radioEl = document.querySelector(`input[name="reviewType"][value="${radioState}"]`);
     if (radioEl) radioEl.checked = true;
   }
+  
+  radioState = state['clinicianRole'];
+  if (radioState) {
+    const radioEl = document.querySelector(`input[name="clinicianRole"][value="${radioState}"]`);
+    if (radioEl) radioEl.checked = true;
+  }
+
 
   // Clear existing dynamic entries and re-add from state
   $('pivc-container').innerHTML = '';
   $('wound-container').innerHTML = '';
+  $('drain-container').innerHTML = '';
   (state.pivcs || []).forEach(v => createPIVCEntry(v));
   (state.wounds || []).forEach(v => createWoundEntry(v));
+  (state.drains || []).forEach(v => createDrainEntry(v));
 }
 
 /* ===========================
@@ -662,6 +733,7 @@ function initialize() {
     el.addEventListener(evt, debouncedComputeAndSave);
   });
   document.querySelectorAll('input[name="reviewType"]').forEach(r => r.addEventListener('change', debouncedComputeAndSave));
+  document.querySelectorAll('input[name="clinicianRole"]').forEach(r => r.addEventListener('change', debouncedComputeAndSave));
 
   // NLR calculation
   ['neut','lymph'].forEach(id => {
@@ -678,6 +750,7 @@ function initialize() {
   sync('crp','bl_crp');
   sync('neut','bl_neut');
   sync('lymph','bl_lymph');
+  sync('bl_cr_review', 'e_cr'); // Sync blood Cr with A-E Cr if needed
 
   // Quick links for GCS and Temp
   $('d_gcs').addEventListener('input', (e)=> {
@@ -732,9 +805,10 @@ function initialize() {
     if (maps[id]) { panel.style.display = 'block'; btn.setAttribute('aria-expanded','true'); btn.querySelector('.icon').textContent='[-]'; }
   });
 
-  // Dynamic PIVC/Wound buttons
+  // Dynamic PIVC/Wound/Drain buttons
   $('add-pivc').addEventListener('click', ()=> { createPIVCEntry(); saveState(); });
   $('add-wound').addEventListener('click', ()=> { createWoundEntry(); saveState(); });
+  $('add-drain').addEventListener('click', ()=> { createDrainEntry(); saveState(); });
 
   // Copy summary
   $('copyBtn').addEventListener('click', ()=> {
@@ -753,7 +827,7 @@ function initialize() {
     staticInputs.forEach(id=>{ const el=$(id); if(el) el.value=''; });
     toggleInputs.forEach(id=>{ const el = $(`toggle_${id}`); if (el) { el.dataset.value='false'; el.classList.remove('active'); const sp = el.querySelector('.state'); if(sp) sp.textContent='No'; } });
     selectInputs.forEach(g=>{ const el=$(g); if(el) el.querySelectorAll('.select-btn').forEach(b=>b.classList.remove('active')); });
-    document.querySelectorAll('#pivc-container .pivc-entry, #wound-container .wound-entry').forEach(n=>n.remove());
+    document.querySelectorAll('#pivc-container .pivc-entry, #wound-container .wound-entry, #drain-container .drain-entry').forEach(n=>n.remove());
     $('summary').value = '';
     computeAll();
     saveState(true);
@@ -820,7 +894,7 @@ function updateBloodFlags(s) {
 
 function calculateTimeOnWard(dateStr, timeOfDay) {
   if (!dateStr) return null;
-  const timeMap = { 'Morning': 9, 'Afternoon': 15, 'Night': 21 };
+  const timeMap = { 'Morning': 9, 'Afternoon': 15, 'Evening': 18, 'Night': 21 };
   const stepdownHour = timeMap[timeOfDay] || 12;
   const [year, month, day] = dateStr.split('-').map(Number);
   const stepdownDate = new Date(year, month - 1, day, stepdownHour, 0, 0);
@@ -838,14 +912,21 @@ function updateDisplay(s, red, amber) {
 
   $('redCount').textContent = redCount;
   $('amberCount').textContent = amberCount;
+  $('redCount').style.color = redCount > 0 ? 'var(--red)' : 'var(--ink)';
+  $('amberCount').style.color = amberCount > 0 ? 'var(--amber)' : 'var(--ink)';
+  
   const catTextEl = $('catText');
   catTextEl.className = 'status ' + cat.id;
   catTextEl.textContent = cat.text;
+  
+  const catBox = $('categoryBox');
+  catBox.style.borderColor = `var(--${cat.id})`;
 
   const flagListEl = $('flagList');
   if (redCount > 0 || amberCount > 0) {
-    const parts = [...red.map(f => `[CAT 1] ${f}`), ...amber.map(f=>`[CAT 2] ${f}`)];
-    flagListEl.innerHTML = parts.map(p=>`<div style="margin:6px 0; color:var(--muted)">${p}</div>`).join('');
+    const redFlagsHTML = red.map(f => `<div style="color:var(--red); font-weight:600; margin:6px 0;">[CAT 1] ${f}</div>`);
+    const amberFlagsHTML = amber.map(f => `<div style="color:var(--amber); font-weight:600; margin:6px 0;">[CAT 2] ${f}</div>`);
+    flagListEl.innerHTML = [...redFlagsHTML, ...amberFlagsHTML].join('');
   } else {
     flagListEl.innerHTML = `<div style="color:var(--muted)">No risk factors identified</div>`;
   }
@@ -872,8 +953,14 @@ function computeAll() {
     else if (flow !== null && flow >= 2) amber.push('NP flow 2-2.5 L/min');
   } else if (s.oxMod === 'HFNP') {
     const fio2 = num(s.hfnpFio2), flow = num(s.hfnpFlow);
-    if ((fio2 > 30) || (flow > 30)) red.push('HFNP: FiO2 >30% or flow >30 L/min');
-    else if ((fio2 > 21) || (flow > 0)) amber.push('On HFNP (low settings)');
+    const hfnpParts = [];
+    if (fio2 > 30) hfnpParts.push(`FiO2 ${fio2}%`);
+    if (flow > 30) hfnpParts.push(`flow ${flow}L`);
+    if (hfnpParts.length > 0) {
+      red.push(`HFNP concern: ${hfnpParts.join(' & ')}`);
+    } else if ((fio2 > 21) || (flow > 0)) {
+      amber.push('On HFNP (low settings)');
+    }
   } else if (s.oxMod === 'NIV') {
     red.push('On NIV');
   }
@@ -886,12 +973,31 @@ function computeAll() {
   if (l > 2.5) red.push(`Lactate ${l}`);
   else if (l >= 2.0) amber.push(`Lactate ${l}`);
   if (s.uopLow) red.push('UOP concerning / downtrending');
-  if (s.renalConcern) red.push('Renal Concern');
+  
+  if (s.renalConcern) {
+    let renalDetails = [];
+    if (s.comorb_esrd) renalDetails.push('ESRD');
+    if (s.bl_cr_review) renalDetails.push(`Cr ${s.bl_cr_review}`);
+    let renalText = 'Renal Concern';
+    if(renalDetails.length > 0) renalText += ` (${renalDetails.join(', ')})`;
+    red.push(renalText);
+  }
+
   if (num(s.icuLos) > 3) amber.push(`ICU LOS ${s.icuLos} days`);
   if (s.neuroConcern === 'severe') red.push('Severe confusion/delirium (GCS <13)');
   else if (s.neuroConcern === 'mild') amber.push('Mild confusion/delirium (GCS 13-14)');
-  if (s.dyspneaConcern === 'severe') red.push('Severe dyspnea');
-  else if (s.dyspneaConcern === 'mild') amber.push('Mild dyspnea');
+
+  if (s.dyspneaConcern === 'severe') {
+    let dyspneaDetails = [];
+    if (s.b_rr) dyspneaDetails.push(`RR ${s.b_rr}`);
+    if (s.b_wob) dyspneaDetails.push(`WOB ${s.b_wob}`);
+    let dyspneaText = 'Severe dyspnea';
+    if (dyspneaDetails.length > 0) dyspneaText += ` (${dyspneaDetails.join(', ')})`;
+    red.push(dyspneaText);
+  } else if (s.dyspneaConcern === 'mild') {
+    amber.push('Mild dyspnea');
+  }
+
   const hb = num(s.hb);
   if (hb !== null && hb < 100) { (hb < 80 ? red : amber).push(`Anemia concern (Hb ${hb})`); }
 
@@ -922,18 +1028,29 @@ function computeAll() {
   updateDisplay(s, red, amber);
 
   // Build summary (plain text, no emojis)
+  const role = s.clinicianRole || 'ALERT CNS';
+  let reviewTitle = `${role} Review`;
+  if (s.reviewType === 'post') {
+      reviewTitle = `${role} post ICU review`;
+  } else { // 'pre'
+      reviewTitle = `${role} pre ICU stepdown review`;
+  }
+  
   const headerLines = [
-    'ALERT CNS Review',
+    reviewTitle,
     '',
     `Patient: ${s.ptName||'--'} | URN: ...${s.ptMrn||'--'} | Location: ${s.ptLoc||'--'}`
   ];
+
   if (s.reviewType === 'post') {
     const timeOnWard = calculateTimeOnWard(s.stepdownDate, s.stepdownTime);
-    headerLines.push('', `Post-ICU step down review. ${timeOnWard || ''} (ICU LOS: ${s.icuLos || '--'} days).`);
+    headerLines.push('', `Patient is ${timeOnWard || '(stepdown date not set)'}. ICU LOS: ${s.icuLos || '--'} days.`);
   } else {
-    headerLines.push('', `Pre-stepdown review. ICU LOS: ${s.icuLos || '--'} days.`);
+    headerLines.push('', `ICU LOS: ${s.icuLos || '--'} days.`);
   }
-  const lines = [...headerLines, `ICU admission for: ${s.ptAdmissionReason || 'Not specified'}`, ''];
+  if(s.ptAdmissionReason) headerLines.push(`ICU admission for: ${s.ptAdmissionReason}`);
+  
+  const lines = [...headerLines, ''];
 
   const atoe = [];
   const score_line = (s.use_mods) ? [s.mods_score ? `MODS Score: ${s.mods_score}`:null, s.mods_details ? `Details: ${s.mods_details}`:null].filter(Boolean).join(' | ') : s.adds ? `ADDS: ${s.adds}` : '';
@@ -973,14 +1090,20 @@ function computeAll() {
   (s.pivcs || []).forEach((loc,i)=> { if (loc && loc.trim()) deviceParts.push(`PIVC #${i+1} (${loc.trim()})`); });
   if (s.dev_other_cvad_type) deviceParts.push(`Other CVAD (${s.dev_other_cvad_type})`);
   if (s.dev_cvc) {
-    deviceParts.push(`CVC (${s.dev_cvc_loc || 'location?'}, site: ${s.dev_cvc_site || 'appearance?'})`);
+    let cvcParts = [];
+    if (s.dev_cvc_loc) cvcParts.push(s.dev_cvc_loc);
+    if (s.dev_cvc_site) cvcParts.push(`site: ${s.dev_cvc_site}`);
+    let cvcDetails = cvcParts.join(', ') || 'details pending';
+    deviceParts.push(`CVC (${cvcDetails})`);
   }
   if (s.dev_tube_type) deviceParts.push(`Enteral Tube (${s.dev_tube_type})`);
+  (s.drains || []).forEach((d,i)=> { if (d && d.trim()) deviceParts.push(`Drain #${i+1} (${d.trim()})`); });
   (s.wounds || []).forEach((w,i)=> { if (w && w.trim()) deviceParts.push(`Wound #${i+1} (${w.trim()})`); });
   if (s.dev_other_note) deviceParts.push(s.dev_other_note);
   if (s.dev_idc) deviceParts.push('IDC');
   if (s.dev_pacing) deviceParts.push('Pacing Wires');
   if (deviceParts.length > 0) {
+    systems.push(''); // Add a space
     if (deviceParts.length > 3) {
       systems.push('Lines/Drains/Wounds:');
       deviceParts.forEach(p=> systems.push('- ' + p));
