@@ -202,7 +202,7 @@
 
     <hr>
     <div class="input-group">
-      <div class="toggle-label" id="toggle_after_hours_discharge" data-value="false" role="button" aria-pressed="false"><span>Discharged after-hours</span><span class="state">No</span></div>
+      <div class="toggle-label" id="toggle_after_hours_discharge" data-value="false" role="button" aria-pressed="false"><span>Discharged after-hours <small style="font-weight:400; color:var(--muted)">(only score for first night on ward)</small></span><span class="state">No</span></div>
       <div class="toggle-label" id="toggle_pressors24h" data-value="false" role="button" aria-pressed="false"><span>Vasopressors in last 24h</span><span class="state">No</span></div>
       <div class="toggle-label" id="toggle_np3Last12h" data-value="false" role="button" aria-pressed="false"><span>Historical O2: NP ≥3L, HFNP >30%, NIV in last 12h, or intubated in last 24h</span><span class="state">No</span></div>
       <div class="toggle-label" id="toggle_rapidWean" data-value="false" role="button" aria-pressed="false"><span>Rapid oxygen wean in last 12h</span><span class="state">No</span></div>
@@ -253,8 +253,8 @@
     <hr>
     <div class="section-title">Clinical Judgement Override</div>
     <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
-      <button class="override-btn amber" id="override_amber">Upgrade to Amber (CAT 2)</button>
-      <button class="override-btn red" id="override_red">Upgrade to Red (CAT 1)</button>
+      <button class="override-btn red" id="override_red">Upgrade to CAT 1</button>
+      <button class="override-btn amber" id="override_amber">Upgrade to CAT 2</button>
       <button class="override-btn" id="override_clear">Clear Override</button>
     </div>
     <input type="hidden" id="override" value="none">
@@ -263,7 +263,7 @@
 
   <div class="card">
     <div class="kpi">
-      <div class="box"><small>Category</small><h3 id="catText" class="status green">LOW</h3></div>
+      <div class="box"><small>Category</small><h3 id="catText" class="status green">CAT 3</h3></div>
       <div class="box"><small>CAT 1 Flags</small><h3 id="redCount">0</h3></div>
       <div class="box"><small>CAT 2 Flags</small><h3 id="amberCount">0</h3></div>
     </div>
@@ -305,6 +305,11 @@
         <div class="col-4"><label>E</label><input id="e_temp" type="number" step="0.1" placeholder="Temp"/></div>
         <div class="col-4"><label>&nbsp;</label><input id="e_bsl" type="number" step="0.1" placeholder="BSL"/></div>
         <div class="col-4"><label>&nbsp;</label><input id="e_uop" type="text" placeholder="UOP"/></div>
+
+        <div class="col-12"><hr></div>
+        <div class="col-12"><label for="ae_mobility">Mobility/MSK</label><input id="ae_mobility" type="text" placeholder="e.g., Bedbound, SOEOB, physio input"/></div>
+        <div class="col-12"><label for="ae_diet">Diet</label><input id="ae_diet" type="text" placeholder="e.g., NBM, clear fluids, dietitian input"/></div>
+        <div class="col-12"><label for="ae_bowels">Bowels</label><input id="ae_bowels" type="text" placeholder="e.g., Last BO, PRN aperients"/></div>
       </div>
     </div>
   </div>
@@ -400,7 +405,7 @@
   <div class="footer-item"><strong>Patient:</strong> <span id="footerName">--</span></div>
   <div class="footer-item"><strong>Room:</strong> <span id="footerLocation">--</span></div>
   <div class="footer-item" style="flex:1 1 auto; min-width:150px;"><strong>Reason:</strong> <span id="footerAdmission">--</span></div>
-  <div id="footerScore" class="footer-score tag green">LOW</div>
+  <div id="footerScore" class="footer-score tag green">CAT 3</div>
 </footer>
 
 <script>
@@ -428,6 +433,7 @@ const staticInputs = [
   'npFlow','hfnpFio2','hfnpFlow','nivDetails','override','overrideNote',
   'mods_score','mods_details','airway_a','b_rr','b_spo2','b_device','b_wob',
   'c_hr','c_nibp','c_cr','c_perf','d_alert','d_gcs','d_pain','e_temp','e_bsl','e_uop','atoe_adds',
+  'ae_mobility','ae_diet','ae_bowels',
   'bl_wcc','bl_wcc_trend','bl_crp','bl_crp_trend','bl_neut','bl_neut_trend','bl_lymph','bl_lymph_trend',
   'bl_hb','bl_hb_trend','bl_plts','bl_plts_trend','bl_k','bl_k_trend',
   'bl_cr_review','bl_cr_review_trend','bl_mg','bl_mg_trend','bl_alb','bl_alb_trend','bl_lac_review','bl_lac_review_trend',
@@ -828,7 +834,7 @@ function calculateTimeOnWard(dateStr, timeOfDay) {
 
 function updateDisplay(s, red, amber) {
   const redCount = red.length, amberCount = amber.length;
-  const cat = (redCount > 0) ? {id: 'red', text: 'HIGH', catNum: 1} : (amberCount > 0) ? {id: 'amber', text: 'MODERATE', catNum: 2} : {id: 'green', text: 'LOW', catNum: 3};
+  const cat = (redCount > 0) ? {id: 'red', text: 'CAT 1', catNum: 1} : (amberCount > 0) ? {id: 'amber', text: 'CAT 2', catNum: 2} : {id: 'green', text: 'CAT 3', catNum: 3};
 
   $('redCount').textContent = redCount;
   $('amberCount').textContent = amberCount;
@@ -838,7 +844,7 @@ function updateDisplay(s, red, amber) {
 
   const flagListEl = $('flagList');
   if (redCount > 0 || amberCount > 0) {
-    const parts = [...red.map(f => `[RED] ${f}`), ...amber.map(f=>`[AMBER] ${f}`)];
+    const parts = [...red.map(f => `[CAT 1] ${f}`), ...amber.map(f=>`[CAT 2] ${f}`)];
     flagListEl.innerHTML = parts.map(p=>`<div style="margin:6px 0; color:var(--muted)">${p}</div>`).join('');
   } else {
     flagListEl.innerHTML = `<div style="color:var(--muted)">No risk factors identified</div>`;
@@ -906,8 +912,8 @@ function computeAll() {
   }
 
   const note = $('overrideNote')?.value ? ` (${$('overrideNote').value})` : '';
-  if ($('override').value === 'red') red.push(`Override: Red concern${note}`);
-  else if ($('override').value === 'amber') amber.push(`Override: Amber concern${note}`);
+  if ($('override').value === 'red') red.push(`Override: CAT 1 concern${note}`);
+  else if ($('override').value === 'amber') amber.push(`Override: CAT 2 concern${note}`);
 
   // Update blood highlights
   updateBloodFlags(s);
@@ -942,6 +948,12 @@ function computeAll() {
   const e_line = [s.e_temp ? `Temp ${s.e_temp}C`:null, s.e_bsl ? `BSL ${s.e_bsl}`:null, s.e_uop ? `UOP ${s.e_uop}`:null].filter(Boolean).join(', ');
   if (e_line) atoe.push(`E: ${e_line}`);
   if (atoe.length > 0) lines.push('', 'A-E ASSESSMENT', ...atoe);
+
+  const otherSystems = [];
+  if (s.ae_mobility) otherSystems.push(`Mobility/MSK: ${s.ae_mobility}`);
+  if (s.ae_diet) otherSystems.push(`Diet: ${s.ae_diet}`);
+  if (s.ae_bowels) otherSystems.push(`Bowels: ${s.ae_bowels}`);
+  if (otherSystems.length > 0) lines.push('', 'OTHER SYSTEMS', ...otherSystems);
 
   // Systems & bloods
   const systems = [];
