@@ -92,6 +92,34 @@
     .toast { position:fixed; left:50%; transform:translateX(-50%); bottom:110px; background:var(--toast-bg); color:var(--toast-color); padding:10px 14px; border-radius:8px; z-index:60; display:none; font-weight:600; }
     .toast.show { display:block; animation: fadeIn .18s ease; }
     @keyframes fadeIn { from { opacity:0; transform:translateX(-50%) translateY(6px); } to { opacity:1; transform:translateX(-50%) translateY(0);} }
+    .devices-subtitle {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-top: 18px;
+      margin-bottom: 10px;
+      color: var(--accent);
+    }
+    #panel_devices .devices-input-group > * {
+      margin-bottom: 10px;
+    }
+    #panel_devices .devices-input-group > *:last-child {
+      margin-bottom: 0;
+    }
+    #panel_devices .devices-input-group label {
+      margin-bottom: 4px; /* less for labels above inputs */
+    }
+    #panel_devices .devices-input-group .toggle-label {
+        margin-bottom: 10px;
+    }
+    #panel_devices input[type="text"], #panel_devices textarea {
+      border-color: #b0c9c9; /* Slightly darker border */
+    }
+    body.dark #panel_devices input[type="text"], body.dark #panel_devices textarea {
+      border-color: #2a3d3f; /* Darker border for dark mode */
+    }
+    #cvc_details textarea {
+      min-height: 50px; /* smaller textarea for CVC site */
+    }
     /* Responsive */
     @media (max-width:900px){
       .col-2,.col-3,.col-4,.col-6,.col-8{grid-column:span 12}
@@ -113,7 +141,6 @@
 </header>
 
 <main class="container" role="main">
-  <!-- Patient Card -->
   <div class="card" aria-labelledby="patientHeading">
     <div class="grid">
       <div class="col-6"><label for="ptName">Patient Initials</label><input id="ptName" type="text" autocomplete="off" /></div>
@@ -141,7 +168,6 @@
     </div>
   </div>
 
-  <!-- Clinical Inputs (condensed) -->
   <div class="card">
     <div class="grid">
       <div class="col-4"><label for="adds">ADDS</label><input id="adds" type="number" min="0" max="10" /></div>
@@ -235,7 +261,6 @@
     <div id="override_reason_box" style="display:none;"><label>Reason for override</label><input id="overrideNote" type="text"/></div>
   </div>
 
-  <!-- KPI & Flags -->
   <div class="card">
     <div class="kpi">
       <div class="box"><small>Category</small><h3 id="catText" class="status green">LOW</h3></div>
@@ -249,7 +274,6 @@
 
   <div class="optional-note">The following sections are optional DMR note helpers</div>
 
-  <!-- A-E Accordion -->
   <div class="accordion-wrapper" data-accordion-id="ae">
     <button class="accordion" aria-expanded="false" aria-controls="panel_ae">A-E Assessment <span class="icon" aria-hidden="true">[+]</span></button>
     <div class="panel" id="panel_ae">
@@ -285,7 +309,6 @@
     </div>
   </div>
 
-  <!-- Bloods Accordion -->
   <div class="accordion-wrapper" data-accordion-id="bloods">
     <button class="accordion" aria-expanded="false" aria-controls="panel_bloods">Bloods <span class="icon" aria-hidden="true">[+]</span></button>
     <div class="panel" id="panel_bloods">
@@ -310,44 +333,51 @@
     </div>
   </div>
 
-  <!-- Devices & Wounds Accordion (improved) -->
   <div class="accordion-wrapper" data-accordion-id="devices">
     <button class="accordion" aria-expanded="false" aria-controls="panel_devices">Lines, Drains & Wounds <span class="icon" aria-hidden="true">[+]</span></button>
     <div class="panel" id="panel_devices">
-      <div class="grid" style="align-items:start; row-gap:14px;">
-        <div class="col-12"><div class="section-title">Lines</div></div>
-
-        <div id="pivc-container" class="col-12" aria-live="polite"></div>
-        <div class="col-12"><button class="btn" id="add-pivc">Add PIVC</button></div>
-
-        <div class="col-4"><label for="dev_other_cvad_type">Other CVAD</label></div>
-        <div class="col-8"><input type="text" id="dev_other_cvad_type" placeholder="Type/Location (e.g. PICC, VasCath)"/></div>
-
-        <div class="col-12"><div class="toggle-label" id="toggle_dev_cvc" data-value="false" role="button" aria-pressed="false">CVC <span class="state">No</span></div></div>
-        <div id="cvc_details" style="display:none; grid-column: 1 / -1;" class="grid" aria-hidden="true">
-          <div class="col-6"><label for="dev_cvc_loc">CVC Location</label><input id="dev_cvc_loc" type="text" placeholder="e.g. R IJV" /></div>
-          <div class="col-6"><label for="dev_cvc_site">Site Appearance</label><textarea id="dev_cvc_site" placeholder="e.g. C&D, no ooze"></textarea></div>
+        <div class="devices-subtitle">▶ Central Lines</div>
+        <div class="devices-input-group">
+            <div class="toggle-label" id="toggle_dev_cvc" data-value="false" role="button" aria-pressed="false">CVC <span class="state">No</span></div>
+            <div id="cvc_details" style="display:none; margin-left: 20px; margin-top: 8px;" aria-hidden="true">
+                <label for="dev_cvc_loc">CVC Location</label>
+                <input id="dev_cvc_loc" type="text" placeholder="e.g. R IJV" style="margin-bottom:8px;" />
+                <label for="dev_cvc_site">Site Appearance</label>
+                <textarea id="dev_cvc_site" placeholder="e.g. C&D, no ooze"></textarea>
+            </div>
+            <label for="dev_other_cvad_type">Other CVAD (PICC, VasCath)</label>
+            <input type="text" id="dev_other_cvad_type" placeholder="Type/Location"/>
         </div>
 
-        <div class="col-4"><label for="dev_tube_type">Enteral Tube</label></div>
-        <div class="col-8"><input type="text" id="dev_tube_type" placeholder="Specify NG/NJ/PEG"/></div>
+        <div class="devices-subtitle">▶ Peripheral Access</div>
+        <div class="devices-input-group">
+            <div id="pivc-container" aria-live="polite"></div>
+            <button class="btn" id="add-pivc" style="margin-top:4px;">+ Add PIVC</button>
+        </div>
 
-        <div class="col-12"><div class="toggle-label" id="toggle_dev_idc" data-value="false" role="button" aria-pressed="false">IDC <span class="state">No</span></div></div>
-        <div class="col-12"><div class="toggle-label" id="toggle_dev_pacing" data-value="false" role="button" aria-pressed="false">Pacing Wires <span class="state">No</span></div></div>
+        <div class="devices-subtitle">▶ Tubes &amp; Catheters</div>
+        <div class="devices-input-group">
+            <label for="dev_tube_type">Enteral Tube</label>
+            <input type="text" id="dev_tube_type" placeholder="Specify NG/NJ/PEG"/>
+            <div class="toggle-label" id="toggle_dev_idc" data-value="false" role="button" aria-pressed="false">IDC <span class="state">No</span></div>
+            <div class="toggle-label" id="toggle_dev_pacing" data-value="false" role="button" aria-pressed="false">Pacing Wires <span class="state">No</span></div>
+        </div>
 
-        <div class="col-12"><hr style="margin:10px 0;"></div>
+        <hr style="margin: 18px 0;" />
 
-        <div class="col-12"><div class="section-title">Wounds</div></div>
-        <div id="wound-container" class="col-12" aria-live="polite"></div>
-        <div class="col-12"><button class="btn" id="add-wound">Add Wound</button></div>
+        <div class="devices-subtitle">▶ Wounds</div>
+        <div class="devices-input-group">
+            <div id="wound-container" aria-live="polite"></div>
+            <button class="btn" id="add-wound" style="margin-top:4px;">+ Add Wound</button>
+        </div>
 
-        <div class="col-4"><label for="dev_other_note">Other</label></div>
-        <div class="col-8"><textarea id="dev_other_note" placeholder="e.g. additional drains or wounds"></textarea></div>
-      </div>
+        <div class="devices-subtitle">▶ Other</div>
+        <div class="devices-input-group">
+            <textarea id="dev_other_note" placeholder="e.g. additional drains or wounds"></textarea>
+        </div>
     </div>
   </div>
 
-  <!-- Auto Generated Summary -->
   <div class="card">
     <div class="section-title">Auto-Generated Summary</div>
     <textarea id="summary" placeholder="Summary will auto-generate here..." readonly style="min-height:240px; font-family:ui-monospace,monospace;"></textarea>
@@ -359,16 +389,13 @@
 
 </main>
 
-<!-- Floating toolbar (mobile) -->
 <div class="floating-toolbar" id="floatingToolbar" aria-hidden="true">
   <button class="btn primary" id="floatingSave">Save</button>
   <button class="btn" id="floatingCopy">Copy</button>
 </div>
 
-<!-- Toasts -->
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-<!-- Footer -->
 <footer role="contentinfo">
   <div class="footer-item"><strong>Patient:</strong> <span id="footerName">--</span></div>
   <div class="footer-item"><strong>Room:</strong> <span id="footerLocation">--</span></div>
@@ -603,7 +630,7 @@ function initialize() {
       }
       if (el.id === 'toggle_dev_cvc') {
         const show = el.dataset.value === 'true';
-        $('cvc_details').style.display = show ? 'grid' : 'none';
+        $('cvc_details').style.display = show ? 'block' : 'none';
         $('cvc_details').setAttribute('aria-hidden', !show);
       }
       debouncedComputeAndSave();
