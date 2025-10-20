@@ -288,7 +288,9 @@
         <div class="col-6 npOnly" style="display:none"><label for="npFlow">NP Flow (L/min)</label><input id="npFlow" type="number" step="0.5" min="0" /></div>
         <div class="col-3 hfnpOnly" style="display:none"><label for="hfnpFio2">HFNP FiO2 (%)</label><input id="hfnpFio2" type="number" step="1" min="21" max="100" /></div>
         <div class="col-3 hfnpOnly" style="display:none"><label for="hfnpFlow">HFNP Flow (L/min)</label><input id="hfnpFlow" type="number" step="1" min="0" /></div>
-        <div class="col-6 nivOnly" style="display:none"><label for="nivDetails">NIV Details</label><input id="nivDetails" type="text" placeholder="Settings (PEEP/PS)"/></div>
+        <div class="col-2 nivOnly" style="display:none;"><label for="nivFio2">FiO2 (%)</label><input id="nivFio2" type="number" min="21" max="100"/></div>
+        <div class="col-2 nivOnly" style="display:none;"><label for="nivPeep">PEEP</label><input id="nivPeep" type="number" min="0"/></div>
+        <div class="col-2 nivOnly" style="display:none;"><label for="nivPs">PS</label><input id="nivPs" type="number" min="0"/></div>
       </div>
       <div style="margin-top:10px">
         <label>Dyspnea/Respiratory Distress</label>
@@ -574,7 +576,7 @@ const normalRanges = {
 /* fields to automatically save/restore */
 const staticInputs = [
   'ptName','ptMrn','ptAge','ptWard','ptBed','ptWardOther','ptAdmissionReason','icuLos','stepdownDate',
-  'npFlow','hfnpFio2','hfnpFlow','nivDetails','override','overrideNote',
+  'npFlow','hfnpFio2','hfnpFlow','nivFio2', 'nivPeep', 'nivPs','override','overrideNote',
   'mods_score','mods_details','airway_a','b_rr','b_spo2','b_device','b_wob',
   'c_hr','c_nibp','c_cr','c_perf','d_alert','d_gcs','d_pain','e_temp','e_bsl','e_uop','atoe_adds',
   'ae_mobility','ae_diet','ae_bowels',
@@ -1148,6 +1150,56 @@ function updateDisplay(s, red, amber, flaggedElements, location) {
 
 function computeAll() {
   const s = getState(); // current state from DOM
+  
+  // === NEW: Auto-populate A-E assessment fields ===
+  let oxyDeviceText = '';
+  switch (s.oxMod) {
+      case 'RA':
+          oxyDeviceText = 'RA';
+          break;
+      case 'NP':
+          const npFlow = s.npFlow;
+          oxyDeviceText = npFlow ? `${npFlow}L NP` : 'NP';
+          break;
+      case 'HFNP':
+          const hfnpFlow = s.hfnpFlow;
+          const hfnpFio2 = s.hfnpFio2;
+          let hfnpParts = [];
+          if (hfnpFlow) hfnpParts.push(`${hfnpFlow}L`);
+          if (hfnpFio2) hfnpParts.push(`${hfnpFio2}%`);
+          oxyDeviceText = `HFNP ${hfnpParts.join(' / ')}`;
+          break;
+      case 'NIV':
+          const nivFio2 = s.nivFio2;
+          const nivPeep = s.nivPeep;
+          const nivPs = s.nivPs;
+          let nivParts = [];
+          if (nivFio2) nivParts.push(`${nivFio2}% FiO2`);
+          if (nivPeep) nivParts.push(`${nivPeep} PEEP`);
+          if (nivPs) nivParts.push(`${nivPs} PS`);
+          oxyDeviceText = `NIV ${nivParts.join(', ')}`;
+          break;
+  }
+  // Update both the DOM and the state object `s` so the summary is correct
+  $('b_device').value = oxyDeviceText.trim();
+  s.b_device = oxyDeviceText.trim();
+
+  // Sync notes to A-E fields if the source note has content
+  if (s.dyspneaConcern_note && s.dyspneaConcern_note.trim() !== '') {
+      $('b_wob').value = s.dyspneaConcern_note;
+      s.b_wob = s.dyspneaConcern_note;
+  }
+  if (s.uopLow_note && s.uopLow_note.trim() !== '') {
+      $('e_uop').value = s.uopLow_note;
+      s.e_uop = s.uopLow_note;
+  }
+  if (s.immobility48h_note && s.immobility48h_note.trim() !== '') {
+      $('ae_mobility').value = s.immobility48h_note;
+      s.ae_mobility = s.immobility48h_note;
+  }
+  // === END of new logic ===
+
+
   const red = [], amber = [];
   const flaggedElements = { red: [], amber: [] };
 
