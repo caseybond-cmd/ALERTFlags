@@ -1151,7 +1151,7 @@ function updateDisplay(s, red, amber, flaggedElements, location) {
 function computeAll() {
   const s = getState(); // current state from DOM
   
-  // === NEW: Auto-populate A-E assessment fields ===
+  // === Auto-populate A-E assessment fields ===
   let oxyDeviceText = '';
   switch (s.oxMod) {
       case 'RA':
@@ -1197,7 +1197,6 @@ function computeAll() {
       $('ae_mobility').value = s.immobility48h_note;
       s.ae_mobility = s.immobility48h_note;
   }
-  // === END of new logic ===
 
 
   const red = [], amber = [];
@@ -1217,7 +1216,6 @@ function computeAll() {
     }
   }
 
-  // --- New Logic for LOS and Immobility ---
   const icuLos = num(s.icuLos);
   const immobility = s.immobility48h;
   const pressors = s.pressors24h;
@@ -1245,9 +1243,7 @@ function computeAll() {
       amber.push('ICU LOS > 7 days');
       flaggedElements.amber.push('icuLos');
   }
-  // --- End of New Logic ---
 
-  // Oxygen flags
   const oxModGroup = $('oxMod');
   if (s.oxMod === 'NP') {
     const flow = num(s.npFlow);
@@ -1290,8 +1286,28 @@ function computeAll() {
     addRisk(red, renalText, s.renalConcern_note, 'toggle_renalConcern', 'red');
   }
   
-  if (s.neuroConcern === 'severe') addRisk(red, 'Severe confusion/delirium (GCS <13)', s.neuroConcern_note, 'neuroConcern', 'red');
-  else if (s.neuroConcern === 'mild') addRisk(amber, 'Mild confusion/delirium (GCS 13-14)', s.neuroConcern_note, 'neuroConcern', 'amber');
+  if (s.neuroConcern === 'severe' || s.neuroConcern === 'mild') {
+      let neuroDetailsParts = [];
+      if (s.d_alert && s.d_alert.trim()) {
+          neuroDetailsParts.push(s.d_alert.trim());
+      }
+      if (s.d_gcs && s.d_gcs.trim()) {
+          neuroDetailsParts.push(`GCS ${s.d_gcs.trim()}`);
+      }
+
+      let neuroDetailsText = '';
+      if (neuroDetailsParts.length > 0) {
+          neuroDetailsText = ` (${neuroDetailsParts.join(', ')})`;
+      }
+
+      if (s.neuroConcern === 'severe') {
+          const baseText = `Severe confusion/delirium${neuroDetailsText}`;
+          addRisk(red, baseText, s.neuroConcern_note, 'neuroConcern', 'red');
+      } else if (s.neuroConcern === 'mild') {
+          const baseText = `Mild confusion/delirium${neuroDetailsText}`;
+          addRisk(amber, baseText, s.neuroConcern_note, 'neuroConcern', 'amber');
+      }
+  }
 
   if (s.dyspneaConcern === 'severe') {
     let dyspneaDetails = [];
@@ -1330,17 +1346,14 @@ function computeAll() {
   if ($('override').value === 'red') red.push(`Override: CAT 1 concern${overrideNote}`);
   else if ($('override').value === 'amber') amber.push(`Override: CAT 2 concern${overrideNote}`);
 
-  // Update blood highlights
   updateBloodFlags(s);
   updateSingleBloodFlag('wcc', num(s.wcc), '');
   updateSingleBloodFlag('crp', num(s.crp), '');
   updateSingleBloodFlag('neut', num(s.neut), '');
   updateSingleBloodFlag('lymph', num(s.lymph), '');
 
-  // Build display
   updateDisplay(s, red, amber, flaggedElements, location);
 
-  // Build summary (plain text)
   const role = s.clinicianRole || 'ALERT CNS';
   let reviewTitle = `${role} Review`;
   if (s.reviewType === 'post') {
