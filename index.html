@@ -86,7 +86,7 @@
         gap: 10px;
     }
     .bloods-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px 12px;}
-    .blood-item { display: grid; grid-template-columns: 50px 1fr 60px; align-items: center; gap: 6px; position: relative;}
+    .blood-item { display: grid; grid-template-columns: 50px 1fr 80px; align-items: center; gap: 6px; position: relative;}
     .blood-item label { margin-bottom: 0; font-size:0.9rem; color:var(--muted); }
     .blood-item input { font-size:0.95rem; padding: 8px; }
     .trend-buttons { display: flex; justify-self: end;}
@@ -120,7 +120,7 @@
     .device-entry, .pivc-entry, .wound-entry, .drain-entry {
       background: var(--card); border:1px solid var(--line); border-radius:12px; padding:10px; margin-bottom:10px; display:flex; flex-direction:column; gap:8px;
     }
-    .device-entry textarea, .pivc-entry textarea, .wound-entry textarea, .drain-entry textarea { width:100%; min-height:50px; font-size:1rem; background:var(--input-bg); }
+    .device-entry textarea, .pivc-entry textarea, .wound-entry textarea, .drain-entry textarea { width:100%; min-height:44px; font-size:1rem; background:var(--input-bg); }
     .remove-entry { background: transparent; border:1px solid rgba(239,68,68,0.12); color:var(--red); border-radius:8px; padding:8px; cursor:pointer; text-align:center; font-weight:700; }
     .remove-entry:hover { background: rgba(239,68,68,0.04); }
     .floating-toolbar { display: none; }
@@ -478,8 +478,8 @@
       </div>
 
       <div style="margin-top:12px" class="grid">
-        <div class="col-12"><label>Electrolyte Plan</label><input id="elec_replace_note" type="text" placeholder="Replacement plan"/></div>
-        <div class="col-12" style="margin-top:8px"><div class="toggle-label" id="toggle_new_bloods_ordered" data-value="false" role="button" aria-pressed="false">New blood request ordered for next phleb round <span class="state">No</span></div></div>
+        <div class="col-12"><label>Electrolyte Plan</label><input id="elec_replace_note" type="text" placeholder="Document if replacement administered, planned or requested."/></div>
+        <div class="col-12" style="margin-top:8px"><div class="toggle-label" id="toggle_new_bloods_ordered" data-value="false" role="button" aria-pressed="false">New blood request ordered for next phleb round? <span class="state">No</span></div></div>
       </div>
     </div>
   </div>
@@ -529,7 +529,7 @@
 
   <div class="card">
     <div class="section-title">Auto-Generated Summary</div>
-    <textarea id="summary" placeholder="Summary will auto-generate here..." readonly style="min-height:240px; font-family:ui-monospace,monospace;"></textarea>
+    <textarea id="summary" placeholder="Summary will auto-generate here..." style="min-height:240px; font-family:ui-monospace,monospace;"></textarea>
     <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
       <button class="btn primary" id="copyBtn">Copy Summary</button>
       <button class="btn danger" id="clearDataBtnBottom">Clear Data / Next Patient</button>
@@ -662,8 +662,10 @@ function createDeviceEntry(type, value = '') {
     div.dataset.type = type;
     div.innerHTML = `
         <label>${type}</label>
-        <textarea placeholder="Enter details for ${type}...">${value}</textarea>
-        <div class="remove-entry" role="button" tabindex="0">Remove</div>
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <textarea style="flex: 1;" placeholder="Enter details for ${type}...">${value}</textarea>
+            <div class="remove-entry" role="button" tabindex="0">Remove</div>
+        </div>
     `;
     container.appendChild(div);
 
