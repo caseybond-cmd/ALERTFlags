@@ -107,7 +107,7 @@
     .tag.red{background:rgba(239,68,68,.08); color:var(--red); border-color:rgba(239,68,68,.2)}
     .tag.amber{background:rgba(245,158,11,.08); color:var(--amber); border-color:rgba(245,158,11,.18)}
     .tag.green{background:rgba(16,185,129,.07); color:var(--green); border-color:rgba(16,185,129,.12)}
-    hr { border: none; height: 1px; background-color: var(--line); margin: 14px 0; }
+    hr { border: none; height: 1px; background-color: var(--line); margin: 24px 0 18px 0; }
     .optional-note { text-align:center; color: var(--muted); font-size: 0.9rem; margin: 18px 0; }
     .accordion-wrapper { border: 1px solid var(--line); border-radius: 12px; overflow:hidden; margin-bottom: 12px;}
     .accordion {
@@ -334,10 +334,11 @@
        <div id="uopLow_note_wrapper" class="concern-note" style="display:none;">
             <textarea id="uopLow_note" placeholder="Optional: enter urine output details"></textarea>
       </div>
-    </div>
-    
-    <div class="input-group">
+      
       <div class="toggle-label" id="toggle_immobility48h" data-value="false" role="button" aria-pressed="false">Immobility >48h <span class="state">No</span></div>
+      <div id="immobility48h_note_wrapper" class="concern-note" style="display:none;">
+          <textarea id="immobility48h_note" placeholder="Optional: enter details of immobility"></textarea>
+      </div>
     </div>
     
     <hr>
@@ -583,7 +584,7 @@ const staticInputs = [
   'elec_replace_note', 'goc_note', 'allergies_note', 'pics_note', 'context_other_note',
   'adds','lactate','hb','wcc','crp','neut','lymph',
   'dyspneaConcern_note', 'renalConcern_note', 'uopLow_note', 'neuroConcern_note', 'infectionConcern_note',
-  'after_hours_discharge_note', 'pressors24h_note', 'np3Last12h_note', 'rapidWean_note'
+  'after_hours_discharge_note', 'pressors24h_note', 'np3Last12h_note', 'rapidWean_note', 'immobility48h_note'
 ];
 const toggleInputs = [
   'after_hours_discharge','pressors24h','np3Last12h','rapidWean','renalConcern','uopLow',
@@ -720,7 +721,7 @@ function getState() {
   // Blood trends
   document.querySelectorAll('.trend-buttons').forEach(group => {
     const activeBtn = group.querySelector('.trend-btn.active');
-    state[group.id] = activeBtn ? activeBtn.dataset.value : '-';
+    state[group.id] = activeBtn ? activeBtn.dataset.value : '';
   });
 
   return state;
@@ -779,7 +780,7 @@ function restoreState(state) {
   
   // Blood trends
   document.querySelectorAll('.trend-buttons').forEach(group => {
-    const value = state[group.id] || '-';
+    const value = state[group.id] || '';
     group.querySelectorAll('.trend-btn').forEach(btn => btn.classList.remove('active'));
     const btnToActivate = group.querySelector(`.trend-btn[data-value="${value}"]`);
     if(btnToActivate) btnToActivate.classList.add('active');
@@ -796,7 +797,7 @@ function initialize() {
   const debouncedComputeAndSave = debounce(()=>{ computeAll(); saveState(true); }, 600);
   
   // Create trend buttons
-  const trends = ['-', '↑', '↓', '→'];
+  const trends = ['↑', '↓', '→'];
   document.querySelectorAll('.trend-buttons').forEach(group => {
       trends.forEach(trend => {
           const btn = document.createElement('button');
@@ -804,10 +805,12 @@ function initialize() {
           btn.className = 'trend-btn';
           btn.dataset.value = trend;
           btn.textContent = trend;
-          if(trend === '-') btn.classList.add('active');
           btn.addEventListener('click', () => {
+              const wasActive = btn.classList.contains('active');
               group.querySelectorAll('.trend-btn').forEach(b => b.classList.remove('active'));
-              btn.classList.add('active');
+              if (!wasActive) {
+                btn.classList.add('active');
+              }
               debouncedComputeAndSave();
           });
           group.appendChild(btn);
@@ -924,6 +927,9 @@ function initialize() {
     staticInputs.forEach(id=>{ const el=$(id); if(el) el.value=''; });
     toggleInputs.forEach(id=>{ const el = $(`toggle_${id}`); if (el) { el.dataset.value='false'; el.classList.remove('active'); const sp = el.querySelector('.state'); if(sp) sp.textContent='No'; } });
     selectInputs.forEach(g=>{ const el=$(g); if(el) el.querySelectorAll('.select-btn').forEach(b=>b.classList.remove('active')); });
+    
+    document.querySelectorAll('.trend-buttons .trend-btn').forEach(btn => btn.classList.remove('active'));
+
     document.querySelectorAll('.concern-note').forEach(el => el.style.display = 'none');
     $('devices-container').innerHTML = '';
     document.querySelectorAll('.accordion-wrapper').forEach(wrapper => {
@@ -1090,8 +1096,11 @@ function updateDisplay(s, red, amber, flaggedElements, location) {
     const catTextEl = $('catText');
     catTextEl.className = 'status ' + cat.id;
     if (cat.id === 'red') {
-      const priorityText = redCount >= 3 ? ' - High Priority' : '';
-      catTextEl.textContent = `${cat.text} (${redCount} flag${redCount > 1 ? 's' : ''})${priorityText}`;
+      if (redCount >= 3) {
+          catTextEl.textContent = `CAT 1 - HIGH PRIORITY - ${redCount} flags`;
+      } else {
+          catTextEl.textContent = 'CAT 1';
+      }
     } else {
       catTextEl.textContent = cat.text;
     }
@@ -1175,8 +1184,7 @@ function computeAll() {
   }
 
   if (immobility && !hasCombinedRedFlag) {
-      amber.push('Immobility >48h');
-      flaggedElements.amber.push('toggle_immobility48h');
+      addRisk(amber, 'Immobility >48h', s.immobility48h_note, 'toggle_immobility48h', 'amber');
   }
 
   if (icuLos > 7) {
@@ -1340,7 +1348,7 @@ function computeAll() {
   const bloods = bloodParts.map(k => {
     const v = s[`bl_${k}`]; if (!v) return null;
     const trendKey = `bl_${k}_trend`;
-    const trend = s[trendKey] || '-';
+    const trend = s[trendKey] || '';
     return `${k.replace('_review','').toUpperCase()} ${v}${trendWord(trend)}`;
   }).filter(Boolean).join(', ');
 
