@@ -17,7 +17,7 @@
     body{font-family:'Inter', system-ui, sans-serif; background:var(--bg); color:var(--ink); margin:0 0 180px 0; line-height:1.4; -webkit-font-smoothing:antialiased;}
     header{padding:14px 18px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:12px; flex-wrap:wrap; background: var(--card); z-index:30;}
     header h1 {
-      font-size: 1.5rem;
+      font-size: 2.0rem;
       font-weight: 800;
       color: var(--accent);
       letter-spacing: -0.5px;
@@ -305,7 +305,6 @@
       </div>
     </div>
     
-    <hr>
     <div class="input-group">
       <label>Neurological Concern?</label>
       <div class="button-group" id="neuroConcern">
@@ -382,7 +381,7 @@
     
     <hr>
     <div class="input-group">
-      <label>Concerning Comorbidities?</label>
+      <div class="section-title">Concerning Comorbidities?</div>
       <div class="comorbidity-grid">
         <div class="toggle-label" id="toggle_comorb_copd" data-value="false" role="button" aria-pressed="false">COPD/Asthma <span class="state">No</span></div>
         <div class="toggle-label" id="toggle_comorb_hf" data-value="false" role="button" aria-pressed="false">Active HF <span class="state">No</span></div>
@@ -1323,7 +1322,7 @@ function computeAll() {
 
 
   const comorbCount = ['comorb_copd','comorb_hf','comorb_esrd','comorb_diabetes','comorb_cirrhosis'].filter(id=>s[id]).length;
-  if (comorbCount >= 3) { red.push(`Multiple comorbidities (${comorbCount})`); ['comorb_copd','comorb_hf','comorb_esrd','comorb_diabetes','comorb_cirrhosis'].forEach(id => {if(s[id]) flaggedElements.red.push('toggle_'+id) });}
+  if (comorbCount >= 3) { red.push('Multiple comorbidities'); ['comorb_copd','comorb_hf','comorb_esrd','comorb_diabetes','comorb_cirrhosis'].forEach(id => {if(s[id]) flaggedElements.red.push('toggle_'+id) });}
   else if (comorbCount > 0) { amber.push(`Comorbidities (${comorbCount})`); ['comorb_copd','comorb_hf','comorb_esrd','comorb_diabetes','comorb_cirrhosis'].forEach(id => {if(s[id]) flaggedElements.amber.push('toggle_'+id) });}
 
   if (s.infectionConcern) {
