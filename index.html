@@ -2123,13 +2123,16 @@ function openRedcapAccelerator() {
 
 
     // --- 2. CALCULATE DATE & SHIFT (UPDATED LOGIC) ---
+
     var now = new Date();
     
-    // A. Date: Format as DD-MM-YYYY
+    // Get Day and Month, ensuring they have a leading zero if needed (e.g., "05")
     var day = ("0" + now.getDate()).slice(-2);
     var month = ("0" + (now.getMonth() + 1)).slice(-2);
     var year = now.getFullYear();
-    var dateString = day + "-" + month + "-" + year; 
+
+    // Combine into YYYY-MM-DD (Database format)
+    var dateString = year + "-" + month + "-" + day; 
 
     // B. Shift: Time Band Logic
     // Day: 07:30 (7.5) to 14:30 (14.5)
