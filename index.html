@@ -2089,24 +2089,21 @@ function generateSummary(s, cat, location, timeOnWardText, red, amber) {
 document.addEventListener('DOMContentLoaded', ()=> {
   initialize();
 });
+</script>
+
 <script>
 function openRedcapAccelerator() {
-    // --- 1. GATHER DATA ---
+    // --- 1. GATHER DATA FROM YOUR TOOL ---
     
-    // A. Role
+    // A. Role (CNS vs CN)
     var roleVal = document.querySelector('input[name="clinicianRole"]:checked')?.value || "ALERT CNS";
-    var teamCode = (roleVal === "ALERT CN") ? "2" : "1"; 
+    var teamCode = (roleVal === "ALERT CN") ? "2" : "1"; // 1=CNS, 2=CN
 
-    // B. Score & Discharge
+    // B. Score
     var score = document.getElementById('adds').value || "0";
-    var isDischarge = document.getElementById('chk_discharge_alert').checked;
 
-    // C. Category (Scrape from footer)
-    // 1 = >72hrs (CAT 1), 2 = >24hrs (CAT 2), 3 = <24hrs (CAT 3)
-    var catText = document.getElementById('footerScore').innerText || "CAT 3";
-    var catCode = "3"; // Default
-    if (catText.includes("CAT 1")) { catCode = "1"; }
-    else if (catText.includes("CAT 2")) { catCode = "2"; }
+    // C. Discharge Status
+    var isDischarge = document.getElementById('chk_discharge_alert').checked;
 
     // D. Ward Mapping
     var wardMap = {
@@ -2120,23 +2117,25 @@ function openRedcapAccelerator() {
         "CCU": "30", "HDU": "41", "ED": "36", 
         "Short Stay": "57", "Transit Lounge": "64"
     };
+    
     var currentWardName = document.getElementById('ptWard').value; 
     var locationCode = wardMap[currentWardName] || ""; 
 
 
-    // --- 2. CALCULATE DATE & SHIFT ---
+    // --- 2. CALCULATE DATE & SHIFT (UPDATED LOGIC) ---
     var now = new Date();
     
-    // A. Date: FIXED to YYYY-MM-DD for REDCap URL
+    // A. Date: Format as DD-MM-YYYY
     var day = ("0" + now.getDate()).slice(-2);
     var month = ("0" + (now.getMonth() + 1)).slice(-2);
     var year = now.getFullYear();
-    var dateString = year + "-" + month + "-" + day; // Standard DB format
+    var dateString = day + "-" + month + "-" + year; 
 
-    // B. Shift Logic (Time Bands)
-    // Day: 07:30 - 14:30
-    // Eve: 14:30 - 20:00
-    // Night: 20:00 - 07:30
+    // B. Shift: Time Band Logic
+    // Day: 07:30 (7.5) to 14:30 (14.5)
+    // Eve: 14:30 (14.5) to 20:00 (20.0)
+    // Night: 20:00 (20.0) onwards
+    
     var currentHour = now.getHours();
     var currentMin = now.getMinutes();
     var decimalTime = currentHour + (currentMin / 60);
@@ -2147,16 +2146,28 @@ function openRedcapAccelerator() {
     } else if (decimalTime >= 14.5 && decimalTime < 20.0) {
         shiftCode = "2"; // Evening
     }
+    // Else stays "3" (Night)
 
-    // --- 3. BUILD URL ---
+    // --- 3. CATEGORY LOGIC (NEW) ---
+    // The tool calculates Category and updates the footer text (e.g., "CAT 1")
+    // We scrape that text to determine the REDCap code.
+    // 1 = >72hrs (CAT 1), 2 = >24hrs (CAT 2), 3 = <24hrs (CAT 3)
+    
+    var catText = document.getElementById('footerScore').innerText || "CAT 3";
+    var catCode = "3"; // Default
+    if (catText.includes("CAT 1")) { catCode = "1"; }
+    else if (catText.includes("CAT 2")) { catCode = "2"; }
+    
+
+    // --- 4. BUILD URL PARAMETERS ---
     var params = [];
 
     // Standard Admin
-    params.push("site=1");
-    params.push("contactreason=6");
+    params.push("site=1");              // Fiona Stanley
+    params.push("contactreason=6");     // ICU Follow Up
     params.push("shifttype=" + shiftCode);
-    params.push("shift_date=" + dateString); // Passing YYYY-MM-DD
-    params.push("icu_category=" + catCode);
+    params.push("shift_date=" + dateString);
+    params.push("icu_category=" + catCode); // NEW: Add Category
     
     // Dynamic Admin
     params.push("alert_team=" + teamCode);
@@ -2165,24 +2176,25 @@ function openRedcapAccelerator() {
     }
     params.push("adds_score=" + score);
 
-    // Interventions
-    params.push("int_group_a___1=1");
-    params.push("int_group_a___8=1");
-    params.push("int_group_b___19=1");
-    params.push("int_group_c___25=1");
+    // "Always Done" Interventions
+    params.push("int_group_a___1=1");  // 01 - ICU follow up
+    params.push("int_group_a___8=1");  // 08 - Perform A-E
+    params.push("int_group_b___19=1"); // 19 - Cognitive assess
+    params.push("int_group_c___25=1"); // 25 - Electrolytes
 
-    // Outcome
+    // Outcome Logic (Discharge vs Continue)
     if (isDischarge) {
-        params.push("outcome=1");
-        params.push("int_group_e___42=1");
+        params.push("outcome=1");          // Discharge from ALERT
+        params.push("int_group_e___42=1"); // Meets Discharge Criteria
     } else {
-        params.push("outcome=3");
-        params.push("int_group_e___41=1");
+        params.push("outcome=3");          // Continue ALERT review
+        params.push("int_group_e___41=1"); // ALERT to continue follow up
     }
 
-    // --- 4. LAUNCH ---
+    // --- 5. LAUNCH ---
     var baseUrl = "https://datalibrary-rc.health.wa.gov.au/surveys/?s=K3WAPC4KKXWNTF3F";
-    window.open(baseUrl + "&" + params.join("&"), '_blank');
+    var finalUrl = baseUrl + "&" + params.join("&");
+    window.open(finalUrl, '_blank');
 }
 </script>
 </body>
